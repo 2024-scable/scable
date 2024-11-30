@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  scable:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: scable
+    ports:
+      - "8282:8282"
+      - "5173:5173"
+      - "8080:8080"
+    environment:
+      - PATH=/home/scable/codeql-cli/:${PATH}
+    stdin_open: true
+    tty: true
+    command: >
+      bash -c "
+      service jenkins start &&
+      python3 /home/scable/main.py &
+      tail -f /dev/null"
+    restart: unless-stopped
