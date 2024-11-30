@@ -67,8 +67,8 @@ RUN echo -e "\033[32m[+] Upgrading Node.js to v23.1.0\033[0m" && \
 # Set working directory
 WORKDIR /home/scable
 
-# Clone project repository from GitHub
-RUN git clone https://github.com/2024-scable/scable .
+# Copy project repository from local machine
+COPY . /home/scable
 
 # Install Python dependencies
 RUN pip3 install --upgrade pip && \
