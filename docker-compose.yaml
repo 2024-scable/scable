@@ -6,6 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: scable
+    hostname: docker_scable
     ports:
       - "8282:8282"
       - "5173:5173"
