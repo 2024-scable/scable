@@ -1,0 +1,26 @@
+Metadata-Version: 2.1
+Name: numppy
+Version: 0.0.1
+Summary: Machine Learning algorithms
+Home-page: UNKNOWN
+Author: Jack Curse
+Author-email: yoyoy25532@doerma.com
+License: MIT
+Keywords: Machinelearning
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Education
+Classifier: Operating System :: Microsoft :: Windows :: Windows 10
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+License-File: LICENSE.txt
+
+This is a simple program to implement to Machine Learning algorithms from scratch
+
+Change Log
+==========
+
+0.0.1 (21/05/2022)
+-------------------
+-First Release
+

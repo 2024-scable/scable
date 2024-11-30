@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SCABLE Settings</title>
+    <style>
+      body {
+        display: flex;
+        font-family: "Roboto", Arial, sans-serif;
+        background-color: #f0f2f5;
+        margin: 0;
+        padding: 0;
+      }
+      .sidebar {
+        width: 200px;
+        height: 100vh;
+        background-color: #1c2a3a;
+        color: #ecf0f1;
+        padding: 20px;
+        position: fixed;
+      }
+      .sidebar h2 {
+        font-size: 18px;
+        margin-bottom: 20px;
+      }
+      .sidebar a {
+        display: block;
+        color: #ecf0f1;
+        text-decoration: none;
+        margin-bottom: 10px;
+        font-size: 16px;
+        padding: 10px 15px;
+        border-radius: 5px;
+      }
+      .sidebar a:hover {
+        background-color: #34495e;
+        color: #ffffff;
+      }
+      .spacer {
+        width: 60px;
+        background-color: #ffffff;
+        height: 100vh;
+      }
+      .content {
+        margin-left: 260px;
+        padding: 30px;
+        flex-grow: 1;
+        background-color: #ffffff;
+        min-height: 100vh;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      }
+      .alert {
+        padding: 15px;
+        background-color: #4caf50;
+        color: white;
+        margin-bottom: 20px;
+        border-radius: 5px;
+      }
+      form h3 {
+        color: #34495e;
+        margin-bottom: 10px;
+        font-size: 18px;
+      }
+      label {
+        font-size: 14px;
+        margin-top: 10px;
+        display: block;
+        color: #7f8c8d;
+      }
+      input[type="text"],
+      input[type="password"],
+      textarea,
+      select {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 14px;
+      }
+      button {
+        padding: 12px 20px;
+        background-color: #3498db;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 20px;
+        display: block;
+        width: 100%;
+        max-width: 300px;
+      }
+      button:hover {
+        background-color: #2980b9;
+      }
+      .card {
+        padding: 20px;
+        background-color: #ecf0f1;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+      }
+      .required {
+        color: #e74c3c;
+        font-weight: bold;
+      }
+      .threshold-red {
+        color: red;
+      }
+      .threshold-yellow {
+        color: orange;
+      }
+      .threshold-green {
+        color: green;
+      }
+      .hint {
+        font-size: 14px;
+        color: #34495e;
+        margin-bottom: 10px;
+      }
+      .hint .example {
+        color: #e67e22;
+        font-weight: bold;
+      }
+      @media (max-width: 768px) {
+        .sidebar {
+          position: relative;
+          width: 100%;
+          height: auto;
+        }
+        .spacer {
+          display: none;
+        }
+        .content {
+          margin-left: 0;
+          padding: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="sidebar">
+      <h2>SCABLE Settings</h2>
+      <a href="#">All Settings</a>
+    </div>
+
+    <div class="spacer"></div>
+
+    <div class="content">
+      {% if success_message %}
+      <div class="alert">{{ success_message }}</div>
+      {% endif %}
+
+      <h2>All Settings</h2>
+      <form
+        action="{{ url_for('settingsController.update_all_settings') }}"
+        method="post"
+      >
+        <div class="card">
+          <h3>GitHub Settings <span class="required">(Required)</span></h3>
+          <label>GitHub API Token:</label>
+          <input
+            type="password"
+            name="github_api_token"
+            value="{{ settings.get('GITHUB_API_TOKEN', '') }}"
+            placeholder="Enter GitHub API Token"
+            required
+          />
+        </div>
+
+        <div class="card">
+          <h3>Slack Settings (Optional)</h3>
+          <label>Slack Webhook URL:</label>
+          <input
+            type="text"
+            name="slack_webhook_url"
+            value="{{ settings.get('SLACK_WEBHOOK_URL', '') }}"
+            placeholder="Enter Slack Webhook URL"
+          />
+          <label>Slack Token:</label>
+          <input
+            type="password"
+            name="slack_token"
+            value="{{ settings.get('SLACK_TOKEN', '') }}"
+            placeholder="Enter Slack Token"
+          />
+          <label>User Tag:</label>
+          <input
+            type="text"
+            name="user_tag"
+            value="{{ settings.get('USER_TAG', '') }}"
+            placeholder="Enter User Tag"
+          />
+          <label>Slack Channel ID:</label>
+          <input
+            type="text"
+            name="slack_channel_id"
+            value="{{ settings.get('SLACK_CHANNEL_ID', '') }}"
+            placeholder="Enter Slack Channel ID"
+          />
+        </div>
+
+        <div class="card">
+          <h3>Jenkins Settings (Optional)</h3>
+          <label>Jenkins URL:</label>
+          <input
+            type="text"
+            name="jenkins_url"
+            value="{{ settings.get('JENKINS_URL', '') }}"
+            placeholder="Enter Jenkins URL"
+          />
+          <label>Jenkins User:</label>
+          <input
+            type="text"
+            name="jenkins_user"
+            value="{{ settings.get('JENKINS_USER', '') }}"
+            placeholder="Enter Jenkins User"
+          />
+          <label>Jenkins API Token:</label>
+          <input
+            type="password"
+            name="jenkins_api_token"
+            value="{{ settings.get('JENKINS_API_TOKEN', '') }}"
+            placeholder="Enter Jenkins API Token"
+          />
+        </div>
+
+        <div class="card">
+          <h3>Reputation Threshold (Optional)</h3>
+          <label>Select Block Reputation Threshold:</label>
+          <div>
+            <label class="threshold-red">
+              <input type="checkbox" name="block_reputation_threshold[]"
+              value="RED" {% if 'RED' in
+              settings.get('BLOCK_REPUTATION_THRESHOLD', []) %}checked{% endif
+              %}> RED(Risky, Score: 46~60) </label
+            ><br />
+            <label class="threshold-yellow">
+              <input type="checkbox" name="block_reputation_threshold[]"
+              value="YELLOW" {% if 'YELLOW' in
+              settings.get('BLOCK_REPUTATION_THRESHOLD', []) %}checked{% endif
+              %}> YELLOW(Warning, Score: 26~45) </label
+            ><br />
+            <label class="threshold-green">
+              <input type="checkbox" name="block_reputation_threshold[]"
+              value="GREEN" {% if 'GREEN' in
+              settings.get('BLOCK_REPUTATION_THRESHOLD', []) %}checked{% endif
+              %}> GREEN(Normal, Score: 0~25) </label
+            ><br />
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Skip Reputation Check Packages (Optional)</h3>
+          <p class="hint">
+            Enter package names to skip reputation check.
+            <span class="example">Example: numpy, pandas, flask</span>
+          </p>
+          <textarea name="skip_reputation_packages" rows="4"></textarea>
+        </div>
+
+        <button type="submit">Save All Settings</button>
+      </form>
+    </div>
+  </body>
+</html>

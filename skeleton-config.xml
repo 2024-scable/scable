@@ -1,0 +1,41 @@
+<project>
+	<actions/>
+	<description/>
+	<keepDependencies>false</keepDependencies>
+	<properties/>
+	<scm class="hudson.plugins.git.GitSCM" plugin="git@5.5.2">
+		<configVersion>2</configVersion>
+		<userRemoteConfigs>
+			<hudson.plugins.git.UserRemoteConfig>
+				<url>{GITHUB_URL}</url>
+				<credentialsId>6a2a9896-6658-4687-a29a-0250089e3e69</credentialsId>
+			</hudson.plugins.git.UserRemoteConfig>
+		</userRemoteConfigs>
+		<branches>
+			<hudson.plugins.git.BranchSpec>
+				<name>*/main</name>
+			</hudson.plugins.git.BranchSpec>
+		</branches>
+		<doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+		<submoduleCfg class="empty-list"/>
+		<extensions/>
+	</scm>
+	<canRoam>true</canRoam>
+	<disabled>false</disabled>
+	<blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+	<blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+	<triggers>
+		<com.cloudbees.jenkins.GitHubPushTrigger plugin="github@1.40.0">
+			<spec/>
+		</com.cloudbees.jenkins.GitHubPushTrigger>
+	</triggers>
+	<concurrentBuild>false</concurrentBuild>
+	<builders>
+		<hudson.tasks.Shell>
+			<command>curl "127.0.0.1:8282/sbom?repo={GITHUB_URL}&lan={LANGUAGE}"</command>
+			<configuredLocalRules/>
+		</hudson.tasks.Shell>
+	</builders>
+	<publishers/>
+	<buildWrappers/>
+</project>
