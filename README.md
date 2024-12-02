@@ -1,4 +1,5 @@
 <!--# SCABLE: Start Secure Software Supply Chain with Ease!-->
+![SCABLE Main Image](https://github.com/2024-scable/scable/blob/main/scable_mainimage.jpg)
 ![SCABLE Main](https://github.com/2024-scable/scable/blob/main/scable_main.jpg)
 SCABLE is an open-source solution that systematically and automatically analyzes software components, providing comprehensive support for security and license management.
 <!--배지-->
