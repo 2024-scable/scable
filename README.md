@@ -18,10 +18,10 @@ SCABLE is an open-source solution that systematically and automatically analyzes
 
 <!--프로젝트 버튼-->
 <p align="center">
-    <a href="https://docs.scable.kr/"><img src="https://img.shields.io/badge/-Readme%20in%20English-2E2E2E?style=for-the-badge" alt="More About SCABLE"></a>
-    <a href="https://dev-ujin.github.io"><img src="https://img.shields.io/badge/-%F0%9F%98%8E%20View%20Demo-F3F781?style=for-the-badge" alt="View Demo"></a>
-    <a href="https://github.com/2024-scable/scable/issues"><img src="https://img.shields.io/badge/-%E2%9C%A8%20Request%20Feature-A9D0F5?style=for-the-badge" alt="Download brochure"></a>
-    <a href="https://github.com/2024-scable/scable/issues"><img src="https://img.shields.io/badge/-%F0%9F%90%9E%20Report%20Bug-F5A9A9?style=for-the-badge" alt="Report Bug"></a>
+    <a href="https://docs.scable.kr/">**More About SCABLE**</a> • 
+    <a href="https://dev-ujin.github.io">**View Demo**</a> • 
+    <a href="https://github.com/2024-scable/scable/issues">**Request Feature**</a> • 
+    <a href="https://github.com/2024-scable/scable/issues">**Report Bug**</a>
 </p>
 
 ---
