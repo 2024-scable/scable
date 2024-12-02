@@ -47,9 +47,9 @@ SCABLE is an open-source solution that systematically and automatically analyzes
 ## Why SCABLE?
 ### SCABLE is designed to help organizations build a secure software supply chain by automating **software component analysis** and **license management**.
 ### It leverages **CodeQL Taint Analysis** to efficiently identify real security threats and focuses on supply chain security management with features like:
-    - Typosquatting detection
-    - License compliance
-    - Real-time CI/CD integration
+ - Typosquatting detection
+ -  License compliance
+ -  Real-time CI/CD integration
 
 
 ## Features
@@ -77,11 +77,11 @@ SCABLE is an open-source solution that systematically and automatically analyzes
 
 
 ## Technologies
-- **[CDXGEN](https://github.com/CycloneDX/cdxgen)**: CycloneDX SBOM generation (Apache-2.0 License).
-- **[OSV-DEV](https://github.com/google/osv.dev)**: Vulnerability lookup based on OSV and NVD databases (Apache-2.0 License).
-- **[CodeQL](https://codeql.github.com/)**: Taint Analysis for identifying vulnerable components (MIT License).
-- **[OSORI DB](https://osori-db.github.io/)**: Open-source license information (ODC-By 1.0 License).
-- **[React Tailwind Admin Template](https://github.com/TailAdmin/free-react-tailwind-admin-dashboard)**: Reporting dashboard (MIT License).
+- **[CDXGEN](https://github.com/CycloneDX/cdxgen)**: CycloneDX SBOM generation **(Apache-2.0 License)**.
+- **[OSV-DEV](https://github.com/google/osv.dev)**: Vulnerability lookup based on OSV and NVD databases **(Apache-2.0 License)**.
+- **[CodeQL](https://codeql.github.com/)**: Taint Analysis for identifying vulnerable components **(MIT License)**.
+- **[OSORI DB](https://osori-db.github.io/)**: Open-source license information **(ODC-By 1.0 License)**.
+- **[React Tailwind Admin Template](https://github.com/TailAdmin/free-react-tailwind-admin-dashboard)**: Reporting dashboard **(MIT License)**.
 
 ---
 
