@@ -89,13 +89,35 @@ curl -s https://raw.githubusercontent.com/2024-scable/scable/main/setup.sh | bas
 ```
 
 
-# [3] Usage
-***스크린샷, 코드** 등을 통해 **사용 방법**과 **사용 예제**를 보여주세요. 사용 예제별로 h2 헤더로 나누어 설명할 수 있습니다.*
+# [3] API Reference
+*1. /sbom*
+Generates SBOM (Software Bill of Materials) in three standard formats: CycloneDX, SWID, and SPDX.
+Tracks "Reachable Components" affected by user input and visualizes the analysis results on the web page.
 
-![usage](img/usage.png)
+**HTTP Request**
+```
+GET http://127.0.0.1:8282/sbom
+```
+**Request Patameters**
+| Parameter    | Type    | Required | Description                     |
+|--------------|---------|----------|---------------------------------|
+| `repo_url`   | string  | Yes      | URL of the repository to analyze |
+| `lan`        | string  | Yes      | Fixed value: `python`           |
 
-```java
-// 몇 개의 API 사용 예제를 코드와 함께 보여주세요.
+**Example Request**
+```
+curl "http://127.0.0.1:8282/sbom?repo_url=https://github.com/example/python-example&lan=python"
+```
+
+**Example Response**
+```
+{
+  "date": "2024-12-02",
+  "start_time": "16-14-28",
+  "repository": "python-example",
+  "language": "python",
+  "reporting_url": "http://localhost:5173/2024-12-02_16-14-28_python-example"
+}
 ```
 
 
