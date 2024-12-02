@@ -231,6 +231,7 @@ As an **open-source and free security platform**, SCABLE provides an easy-to-use
 
 # [6] Contact
 - 📧 2024scable@gmail.com
+
 SCABLE is an open-source project where everyone is welcome to contribute and collaborate.
 
 We look forward to hearing from you to improve and expand the project together.
