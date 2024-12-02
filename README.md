@@ -13,7 +13,7 @@ SCABLE is an open-source solution that systematically and automatically analyzes
 
 <!--프로젝트 대문 이미지-->
 <div align="center">
-    <img src="https://github.com/2024-scable/scable/blob/main/scable_main.jpg" alt="SCABLE Main Image" width="800" />
+    <img src="https://github.com/2024-scable/scable/blob/main/img/scable_mainpage.jpg" alt="SCABLE Main Image" width="800" />
 </div>
 
 <!--프로젝트 버튼-->
