@@ -124,8 +124,9 @@ curl -s https://raw.githubusercontent.com/2024-scable/scable/main/setup.sh | bas
 
 
 # [7] License
-MIT 라이센스
-라이센스에 대한 정보는 [`LICENSE`][license-url]에 있습니다.
+This project is licensed under the Apache License 2.0.
+SCABLE integrates open-source technologies, including CDXGEN (Apache-2.0), OSV-DEV (Apache-2.0), CodeQL (MIT), OSORI DB (ODC-By 1.0), and React Tailwind Admin Template (MIT). For details, refer to the respective project licenses.
+License information can be found in the [`LICENSE`][license-url] file.
 
 
 
