@@ -119,8 +119,82 @@ curl "http://127.0.0.1:8282/sbom?repo_url=https://github.com/example/python-exam
   "reporting_url": "http://localhost:5173/2024-12-02_16-14-28_python-example"
 }
 ```
+*2. /package-check*
+Evaluates the potential risk of a package by analyzing its age, days since the last modification, number of release versions, download count, GitHub stars, and typosquatting suspicion. Assigns a score and risk level to identify potentially malicious packages.
 
+**HTTP Request**
+```
+GET http://127.0.0.1:8282/package-check
+```
+GET http://127.0.0.1:8282/sbom
+```
+**Request Patameters**
+| Parameter    | Type    | Required | Description                     |
+|--------------|---------|----------|---------------------------------|
+| `repo_url`   | string  | Yes      | URL of the repository to analyze |
+| `lan`        | string  | Yes      | Fixed value: `python`           |
 
+**Example Request**
+```
+curl "http://scable.kr:8282/package-check?package_name=requests"
+curl "http://scable.kr:8282/package-check?package_name=numppy"
+```
+
+**Example Response**
+```
+#Example 1. Trusted Package
+{
+  "message": "Matches TOP 8000 PyPI packages",
+  "package_name": "requests",
+  "risk_level": "Green",
+  "score": 0
+}
+#Example 2: Typosquatting Suspected
+{
+  "message": "Typosquatting suspected",
+  "package_name": "numppy",
+  "platform": "pypi",
+  "reasons": {
+    "Downloads < 300": "+20 points",
+    "GitHub stars < 30": "+10 points",
+    "Last modified > 2 years": "+10 points",
+    "Versions count < 5": "+10 points"
+  },
+  "risk_level": "Red",
+  "score": 50,
+  "similar_packages": [
+    [
+      "numpy",
+      90.9090909090909
+    ]
+  ],
+  "status": "Warning",
+  "version": null
+}
+```
+
+```
+**Request Patameters**
+| Parameter    | Type    | Required | Description                     |
+|--------------|---------|----------|---------------------------------|
+| `repo_url`   | string  | Yes      | URL of the repository to analyze |
+| `lan`        | string  | Yes      | Fixed value: `python`           |
+
+**Example Request**
+```
+curl "http://127.0.0.1:8282/sbom?repo_url=https://github.com/example/python-example&lan=python"
+```
+
+**Example Response**
+```
+{
+  "date": "2024-12-02",
+  "start_time": "16-14-28",
+  "repository": "python-example",
+  "language": "python",
+  "reporting_url": "http://localhost:5173/2024-12-02_16-14-28_python-example"
+}
+```
 
 # [4] Contribution
 기여해주신 모든 분들께 대단히 감사드립니다.[`contributing guide`][contribution-url]를 참고해주세요.
