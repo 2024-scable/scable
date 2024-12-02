@@ -5,13 +5,12 @@
 <h1 align="center" style="border-bottom: none">
     <div>
         <a style="color:#36f" href="https://github.com/2024-scable/scable">
-            <img src="https://github.com/2024-scable/scable/blob/main/scable.png" width="80" />
-            <br>
-            SCABLE
+            <img src="https://github.com/2024-scable/scable/blob/main/scable.png" width="200" />
         </a>
     </div>
     Start secure your software supply chain with ease, powered by SCABLE! <br>
 </h1>
+
 
 
 
