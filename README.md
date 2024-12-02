@@ -42,59 +42,49 @@ SCABLE is an open-source solution that systematically and automatically analyzes
 
 ---
 
-[1] About the Project
-Why SCABLE?
-SCABLE is an open-source solution designed to help organizations secure their software supply chain by automating:
+# [1] About the Project
 
-Software component analysis
-License management
-Key highlights include:
+## Why SCABLE?
+SCABLE is designed to help organizations build a secure software supply chain by automating **software component analysis** and **license management**.
+It leverages **CodeQL Taint Analysis** to efficiently identify real security threats and focuses on supply chain security management with features like:
 
-Leveraging CodeQL Taint Analysis to efficiently identify real security threats.
-Managing supply chain security with features like:
 Typosquatting detection
-License compliance analysis
-Real-time CI/CD pipeline integration
-Features
-SCABLE offers six core functionalities to enhance supply chain security:
-
-🛠️ Automated SBOM Generation
-Generate SBOMs in CycloneDX, SPDX, and SWID formats to ensure compatibility with industry standards.
-
-🛡️ Real Threat Identification
-Use CodeQL Taint Analysis to distinguish real security threats from false positives, enabling teams to focus on critical vulnerabilities.
-
-🔍 Open-Source License Compliance Analysis
-Scan software for open-source components and licenses to manage compliance and mitigate legal risks.
-
-🕵️ Detection of Typosquatting & Malicious Packages
-Analyze dependency reputation based on download count, GitHub stars, and modification history to detect typosquatting and suspicious packages.
-
-📊 Interactive Dashboard Reporting
-Visualize SBOM data, vulnerabilities, and compliance issues in a user-friendly dashboard for real-time monitoring and reporting.
-
-⚙️ Seamless CI/CD Integration
-Integrate SCABLE into CI/CD pipelines for automated, real-time security and compliance checks during the development lifecycle.
-
-Technologies
-SCABLE utilizes powerful open-source technologies to deliver its core functionalities:
-
-CDXGEN
-CycloneDX SBOM generation (Apache-2.0 License).
-
-OSV-DEV
-Vulnerability lookup using OSV and NVD databases (Apache-2.0 License).
-
-CodeQL
-Taint Analysis to identify real threats in software components (MIT License).
-
-OSORI DB
-Open-source license information for managing compliance (ODC-By 1.0 License).
-
-React Tailwind Admin Template
-Reporting dashboard for SBOM analysis results (MIT License).
+License compliance
+Real-time CI/CD integration
 
 
+## Features
+
+### SCABLE provides six key functionalities:
+
+- 🛠️ **Automated SBOM Generation**  
+  Generate SBOMs in CycloneDX, SPDX, and SWID formats.
+
+- 🛡️ **Identification of Real Threats**  
+  Identify real security threats among vulnerabilities detected in SBOMs using advanced analysis.
+
+- 🔍 **Open-Source License Analysis**  
+  Ensure compliance by analyzing open-source licenses in your software.
+
+- 🕵️ **Detection of Typosquatting & Malicious Packages**  
+  Detect typosquatting attempts and analyze dependency reputation.
+
+- 📊 **Dashboard Reporting**  
+  Visualize SBOM analysis results in a user-friendly dashboard.
+
+- ⚙️ **Seamless CI/CD Integration**  
+  Integrate into CI/CD pipelines for automated security and compliance checks.
+
+
+
+## Technologies
+- **[CDXGEN](https://github.com/CycloneDX/cdxgen)**: CycloneDX SBOM generation (Apache-2.0 License).
+- **[OSV-DEV](https://github.com/google/osv.dev)**: Vulnerability lookup based on OSV and NVD databases (Apache-2.0 License).
+- **[CodeQL](https://codeql.github.com/)**: Taint Analysis for identifying vulnerable components (MIT License).
+- **[OSORI DB](https://osori-db.github.io/)**: Open-source license information (ODC-By 1.0 License).
+- **[React Tailwind Admin Template](https://github.com/TailAdmin/free-react-tailwind-admin-dashboard)**: Reporting dashboard (MIT License).
+
+---
 
 # [2] Getting Started
 
