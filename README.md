@@ -172,10 +172,26 @@ curl "http://scable.kr:8282/package-check?package_name=numppy"
 ```
 
 # [4] Usage Screenshots
-기여해주신 모든 분들께 대단히 감사드립니다.[`contributing guide`][contribution-url]를 참고해주세요.
-이 프로젝트의 기여하신 분들을 소개합니다! 🙆‍♀️
-*이모티콘 쓰는 것을 좋아한다면, 버그 수정에 🐞, 아이디어 제공에 💡, 새로운 기능 구현에 ✨를 사용할 수 있습니다.*
-- 🐞 [dev-ujin](https://github.com/dev-ujin): 메인페이지 버그 수정
+## SBOM DashBoard
+![SCABLE Dashboard](https://github.com/2024-scable/scable/blob/main/img/scable_dashboard.jpg)
+
+## Vulnerable Components
+![SCABLE Vulnerabilities](https://github.com/2024-scable/scable/blob/main/img/scable_vulnerabilities.jpg)
+
+## Additional Vulnerability Details
+![SCABLE Vulnerabilities Detailed](https://github.com/2024-scable/scable/blob/main/img/scable_vulnerabilities.jpg)
+
+## Malicious Package Reporting DashBoard
+![SCABLE Dashboard Insights](https://github.com/2024-scable/scable/blob/main/img/scable_dashboard2.jpg)
+
+## Package Details
+![SCABLE Package Analysis](https://github.com/2024-scable/scable/blob/main/img/scable_package.jpg)
+
+## License Analysis DashBoard
+![SCABLE Advanced Dashboard](https://github.com/2024-scable/scable/blob/main/img/scable_dashboard3.jpg)
+
+## License Details
+![SCABLE License Analysis](https://github.com/2024-scable/scable/blob/main/img/scable_license.jpg)
 
 
 
