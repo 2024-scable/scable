@@ -114,6 +114,10 @@ Generates SBOM (Software Bill of Materials) in three standard formats: CycloneDX
 
 Tracks "Reachable Components" affected by user input and visualizes the analysis results on the web page.
 
+> **⚠️ Important Note:**  
+> SCABLE **currently provides robust analysis for Python-based projects** and is actively evolving to include support for **additional programming languages** in the near future.  
+> This will enable **broader compatibility** and adaptability for various development environments.  
+
 ### HTTP Request
 ```
 GET http://127.0.0.1:8282/sbom
