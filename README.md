@@ -36,7 +36,7 @@ SCABLE is an open-source solution that systematically and automatically analyzes
   - [Installation](#installation)
 - [[3] API Reference](#3-api-reference)
 - [[4] Usage Screenshots](#4-usage-screenshots)
-- [[5] SCABLE's VISION](#5-scable's-vision)
+- [[5] SCABLE's VISION](#5-scables-vision)
 - [[6] Contact](#6-contact)
 - [[7] License](#7-license)
 
