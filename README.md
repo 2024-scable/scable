@@ -171,7 +171,7 @@ curl "http://scable.kr:8282/package-check?package_name=numppy"
 }
 ```
 
-# [4] Contribution
+# [4] Usage Screenshots
 기여해주신 모든 분들께 대단히 감사드립니다.[`contributing guide`][contribution-url]를 참고해주세요.
 이 프로젝트의 기여하신 분들을 소개합니다! 🙆‍♀️
 *이모티콘 쓰는 것을 좋아한다면, 버그 수정에 🐞, 아이디어 제공에 💡, 새로운 기능 구현에 ✨를 사용할 수 있습니다.*
