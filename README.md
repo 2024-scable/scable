@@ -2,6 +2,12 @@
 ![SCABLE Logo](https://github.com/2024-scable/scable/blob/main/scable.png)
 # Start secure your software supply chain with ease, powered by SCABLE!
 
+<div align="center">
+  <img src="https://github.com/2024-scable/scable/blob/main/scable.png" alt="SCABLE Logo" width="150">
+  <h1>Start secure your software supply chain with ease, powered by SCABLE!</h1>
+</div>
+
+
 SCABLE is an open-source solution that systematically and automatically analyzes software components, providing comprehensive support for security and license management.
 <!--배지-->
 ![MIT License][license-shield] ![Repository Size][repository-size-shield] ![Issue Closed][issue-closed-shield]
