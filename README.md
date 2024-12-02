@@ -90,26 +90,26 @@ curl -s https://raw.githubusercontent.com/2024-scable/scable/main/setup.sh | bas
 
 
 # [3] API Reference
-*1. /sbom*
+###1. /sbom
 Generates SBOM (Software Bill of Materials) in three standard formats: CycloneDX, SWID, and SPDX.
 Tracks "Reachable Components" affected by user input and visualizes the analysis results on the web page.
 
-**HTTP Request**
+##HTTP Request
 ```
 GET http://127.0.0.1:8282/sbom
 ```
-**Request Patameters**
+##Request Patameters
 | Parameter    | Type    | Required | Description                     |
 |--------------|---------|----------|---------------------------------|
 | `repo_url`   | string  | Yes      | URL of the repository to analyze |
 | `lan`        | string  | Yes      | Fixed value: `python`           |
 
-**Example Request**
+##Example Request
 ```
 curl "http://127.0.0.1:8282/sbom?repo_url=https://github.com/example/python-example&lan=python"
 ```
 
-**Example Response**
+##Example Response
 ```
 {
   "date": "2024-12-02",
