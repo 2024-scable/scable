@@ -2,10 +2,17 @@
 ![SCABLE Logo](https://github.com/2024-scable/scable/blob/main/scable.png)
 # Start secure your software supply chain with ease, powered by SCABLE!
 
-<div align="center">
-  <img src="https://github.com/2024-scable/scable/blob/main/scable.png" alt="SCABLE Logo" width="150">
-  <h1>Start secure your software supply chain with ease, powered by SCABLE!</h1>
-</div>
+<h1 align="center" style="border-bottom: none">
+    <div>
+        <a style="color:#36f" href="https://github.com/2024-scable/scable">
+            <img src="https://github.com/2024-scable/scable/blob/main/scable.png" width="80" />
+            <br>
+            SCABLE
+        </a>
+    </div>
+    Start secure your software supply chain with ease, powered by SCABLE! <br>
+</h1>
+
 
 
 SCABLE is an open-source solution that systematically and automatically analyzes software components, providing comprehensive support for security and license management.
