@@ -50,12 +50,15 @@ SCABLE is an open-source solution that systematically and automatically analyzes
 
 ## Features
 ### SCABLE provides six key functionalities:
-1. Automated SBOM generation in CycloneDX, SPDX, and SWID formats.
-2. Identification of real threats among vulnerabilities detected in SBOMs.
-3. Open-source license analysis for compliance.
-4. Detection of typosquatting and suspicious malicious packages.
-5. Dashboard reporting for SBOM analysis results.
-6. Seamless CI/CD pipeline integration.
+<ul>
+    <li>🛠️ <strong>Automated SBOM generation</strong> in CycloneDX, SPDX, and SWID formats.</li>
+    <li>🛡️ <strong>Identification of real threats</strong> among vulnerabilities detected in SBOMs.</li>
+    <li>🔍 <strong>Open-source license analysis</strong> for compliance.</li>
+    <li>🕵️ <strong>Detection of typosquatting</strong> and suspicious malicious packages.</li>
+    <li>📊 <strong>Dashboard reporting</strong> for SBOM analysis results.</li>
+    <li>⚙️ <strong>Seamless CI/CD pipeline integration</strong>.</li>
+</ul>
+
 
 ## Technologies
 - **[CDXGEN](https://github.com/CycloneDX/cdxgen)**: CycloneDX SBOM generation (Apache-2.0 License).
