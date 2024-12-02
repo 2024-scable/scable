@@ -45,12 +45,11 @@ SCABLE is an open-source solution that systematically and automatically analyzes
 # [1] About the Project
 
 ## Why SCABLE?
-SCABLE is designed to help organizations build a secure software supply chain by automating **software component analysis** and **license management**.
-It leverages **CodeQL Taint Analysis** to efficiently identify real security threats and focuses on supply chain security management with features like:
-
-### - Typosquatting detection
-### - License compliance
-### - Real-time CI/CD integration
+### SCABLE is designed to help organizations build a secure software supply chain by automating **software component analysis** and **license management**.
+### It leverages **CodeQL Taint Analysis** to efficiently identify real security threats and focuses on supply chain security management with features like:
+    - Typosquatting detection
+    - License compliance
+    - Real-time CI/CD integration
 
 
 ## Features
