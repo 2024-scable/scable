@@ -120,9 +120,7 @@ curl -s https://raw.githubusercontent.com/2024-scable/scable/main/setup.sh | bas
 
 
 # [6] Contact
-- 📧 dev.ujin518@gmail.com
-- 📋 [https://dev-ujin.github.io/contact](https://dev-ujin.github.io/contact)
-
+- 📧 2024scable@gmail.com
 
 
 # [7] License
@@ -146,6 +144,6 @@ MIT 라이센스
 [request-feature-url]: https://github.com/2024-scable/scable/issues
 
 <!--URLS-->
-[license-url]: LICENSE.md
+[license-url]: LICENSE
 [contribution-url]: CONTRIBUTION.md
 [readme-eng-url]: ../README.md
