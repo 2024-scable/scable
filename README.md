@@ -1,11 +1,9 @@
 <!--# SCABLE: Start Secure Software Supply Chain with Ease!-->
-![SCABLE Logo](https://github.com/2024-scable/scable/blob/main/scable.png)
-# Start secure your software supply chain with ease, powered by SCABLE!
 
 <h1 align="center" style="border-bottom: none">
     <div>
         <a style="color:#36f" href="https://github.com/2024-scable/scable">
-            <img src="https://github.com/2024-scable/scable/blob/main/scable.png" width="200" />
+            <img src="https://github.com/2024-scable/scable/blob/main/scable.png" width="250" />
         </a>
     </div>
     Start secure your software supply chain with ease, powered by SCABLE! <br>
