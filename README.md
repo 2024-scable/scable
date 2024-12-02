@@ -83,6 +83,10 @@ SCABLE is an open-source solution that systematically and automatically analyzes
 - **[OSORI DB](https://osori-db.github.io/)**: Open-source license information **(ODC-By 1.0 License)**.
 - **[React Tailwind Admin Template](https://github.com/TailAdmin/free-react-tailwind-admin-dashboard)**: Reporting dashboard **(MIT License)**.
 
+## Supported Languages  
+- **Python** *(current support)*: SCABLE provides comprehensive analysis for Python-based projects.  
+- **Future Expansion**: Support for additional programming languages is actively under development to meet diverse project needs.  
+
 ---
 
 # [2] Getting Started
