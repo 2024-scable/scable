@@ -141,9 +141,9 @@ MIT 라이센스
 [view-demo-shield]: https://img.shields.io/badge/-%F0%9F%98%8E%20view%20demo-F3F781?style=for-the-badge
 [view-demo-url]: https://dev-ujin.github.io
 [report-bug-shield]: https://img.shields.io/badge/-%F0%9F%90%9E%20report%20bug-F5A9A9?style=for-the-badge
-[report-bug-url]: https://github.com/dev-ujin/readme-template/issues
+[report-bug-url]: [https://github.com/dev-ujin/readme-template/issues](https://github.com/2024-scable/scable/issues)
 [request-feature-shield]: https://img.shields.io/badge/-%E2%9C%A8%20request%20feature-A9D0F5?style=for-the-badge
-[request-feature-url]: https://github.com/dev-ujin/readme-template/issues
+[request-feature-url]: [https://github.com/dev-ujin/readme-template/issues](https://github.com/2024-scable/scable/issues)
 
 <!--URLS-->
 [license-url]: LICENSE.md
