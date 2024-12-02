@@ -20,8 +20,8 @@ SCABLE is an open-source solution that systematically and automatically analyzes
 <p align="center">
     <a href="https://github.com/2024-scable/scable"><img src="https://img.shields.io/badge/-Readme%20in%20English-2E2E2E?style=for-the-badge" alt="Readme in English"></a>
     <a href="https://dev-ujin.github.io"><img src="https://img.shields.io/badge/-%F0%9F%98%8E%20View%20Demo-F3F781?style=for-the-badge" alt="View Demo"></a>
-    <a href="https://github.com/dev-ujin/readme-template/issues"><img src="https://img.shields.io/badge/-%F0%9F%90%9E%20Report%20Bug-F5A9A9?style=for-the-badge" alt="Report Bug"></a>
-    <a href="https://github.com/dev-ujin/readme-template/issues"><img src="https://img.shields.io/badge/-%E2%9C%A8%20Request%20Feature-A9D0F5?style=for-the-badge" alt="Request Feature"></a>
+    <a href="https://github.com/2024-scable/scable/issues"><img src="https://img.shields.io/badge/-%F0%9F%90%9E%20Report%20Bug-F5A9A9?style=for-the-badge" alt="Report Bug"></a>
+    <a href="https://github.com/2024-scable/scable/issues"><img src="https://img.shields.io/badge/-%E2%9C%A8%20Request%20Feature-A9D0F5?style=for-the-badge" alt="Request Feature"></a>
 </p>
 
 ---
@@ -126,6 +126,7 @@ curl -s https://raw.githubusercontent.com/2024-scable/scable/main/setup.sh | bas
 # [7] License
 This project is licensed under the Apache License 2.0.
 SCABLE integrates open-source technologies, including CDXGEN (Apache-2.0), OSV-DEV (Apache-2.0), CodeQL (MIT), OSORI DB (ODC-By 1.0), and React Tailwind Admin Template (MIT). For details, refer to the respective project licenses.
+
 License information can be found in the [`LICENSE`][license-url] file.
 
 
@@ -146,5 +147,4 @@ License information can be found in the [`LICENSE`][license-url] file.
 
 <!--URLS-->
 [license-url]: LICENSE
-[contribution-url]: CONTRIBUTION.md
 [readme-eng-url]: ../README.md
