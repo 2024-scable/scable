@@ -111,6 +111,7 @@ curl -s https://raw.githubusercontent.com/2024-scable/scable/main/setup.sh | bas
 # [3] API Reference
 ## 1. /sbom
 Generates SBOM (Software Bill of Materials) in three standard formats: CycloneDX, SWID, and SPDX.
+
 Tracks "Reachable Components" affected by user input and visualizes the analysis results on the web page.
 
 ### HTTP Request
@@ -139,7 +140,9 @@ curl "http://127.0.0.1:8282/sbom?repo_url=https://github.com/example/python-exam
 }
 ```
 ## 2. /package-check
-Evaluates the potential risk of a package by analyzing its age, days since the last modification, number of release versions, download count, GitHub stars, and typosquatting suspicion. Assigns a score and risk level to identify potentially malicious packages.
+Evaluates the potential risk of a package by analyzing its age, days since the last modification, number of release versions, download count, GitHub stars, and typosquatting suspicion. 
+
+Assigns a score and risk level to identify potentially malicious packages.
 
 ### HTTP Request
 ```
@@ -218,12 +221,15 @@ curl "http://scable.kr:8282/package-check?package_name=numppy"
 ### "SCABLE ensures the reliability and security of software supply chains, empowering organizations to manage supply chain security efficiently and systematically."
 
 ✔️ Enhancing Transparency Across the Supply Chain
+
 SCABLE enables organizations to clearly understand the components of their software supply chain through **SBOM generation** and **license analysis**. By adhering to global standards, SCABLE ensures **trust and transparency**.
 
 ✔️ Efficient and Practical Vulnerability Management
+
 With CodeQL-based analysis and typosquatting detection, SCABLE identifies critical risks in the supply chain, allowing organizations to **focus on resolving real security challenges**.
 
 ✔️ Accessible and Scalable Solution
+
 As an **open-source and free security platform**, SCABLE provides an easy-to-use solution for managing software supply chain security, ensuring accessibility for organizations of all sizes.
 
 
