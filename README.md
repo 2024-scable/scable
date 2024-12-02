@@ -3,7 +3,7 @@
 <h1 align="center" style="border-bottom: none">
     <div>
         <a style="color:#36f" href="https://github.com/2024-scable/scable">
-            <img src="https://github.com/2024-scable/scable/blob/main/scable.png" width="250" />
+            <img src="https://github.com/2024-scable/scable/blob/main/img/scable.png" width="250" />
         </a>
     </div>
     Start secure your software supply chain with ease! <br>
