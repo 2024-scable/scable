@@ -90,26 +90,26 @@ curl -s https://raw.githubusercontent.com/2024-scable/scable/main/setup.sh | bas
 
 
 # [3] API Reference
-###1. /sbom
+## 1. /sbom
 Generates SBOM (Software Bill of Materials) in three standard formats: CycloneDX, SWID, and SPDX.
 Tracks "Reachable Components" affected by user input and visualizes the analysis results on the web page.
 
-##HTTP Request
+### HTTP Request
 ```
 GET http://127.0.0.1:8282/sbom
 ```
-##Request Patameters
+### Request Patameters
 | Parameter    | Type    | Required | Description                     |
 |--------------|---------|----------|---------------------------------|
 | `repo_url`   | string  | Yes      | URL of the repository to analyze |
 | `lan`        | string  | Yes      | Fixed value: `python`           |
 
-##Example Request
+### Example Request
 ```
 curl "http://127.0.0.1:8282/sbom?repo_url=https://github.com/example/python-example&lan=python"
 ```
 
-##Example Response
+### Example Response
 ```
 {
   "date": "2024-12-02",
@@ -119,28 +119,26 @@ curl "http://127.0.0.1:8282/sbom?repo_url=https://github.com/example/python-exam
   "reporting_url": "http://localhost:5173/2024-12-02_16-14-28_python-example"
 }
 ```
-*2. /package-check*
+## 2. /package-check
 Evaluates the potential risk of a package by analyzing its age, days since the last modification, number of release versions, download count, GitHub stars, and typosquatting suspicion. Assigns a score and risk level to identify potentially malicious packages.
 
-**HTTP Request**
+### HTTP Request
 ```
 GET http://127.0.0.1:8282/package-check
 ```
-GET http://127.0.0.1:8282/sbom
-```
-**Request Patameters**
-| Parameter    | Type    | Required | Description                     |
-|--------------|---------|----------|---------------------------------|
-| `repo_url`   | string  | Yes      | URL of the repository to analyze |
-| `lan`        | string  | Yes      | Fixed value: `python`           |
 
-**Example Request**
+### Request Patameters
+| Parameter     | Type    | Required | Description                         |
+|---------------|---------|----------|-------------------------------------|
+| package_name  | string  | Yes      | The name of the PyPI package to check |
+
+### Example Request
 ```
 curl "http://scable.kr:8282/package-check?package_name=requests"
 curl "http://scable.kr:8282/package-check?package_name=numppy"
 ```
 
-**Example Response**
+### Example Response
 ```
 #Example 1. Trusted Package
 {
@@ -170,29 +168,6 @@ curl "http://scable.kr:8282/package-check?package_name=numppy"
   ],
   "status": "Warning",
   "version": null
-}
-```
-
-```
-**Request Patameters**
-| Parameter    | Type    | Required | Description                     |
-|--------------|---------|----------|---------------------------------|
-| `repo_url`   | string  | Yes      | URL of the repository to analyze |
-| `lan`        | string  | Yes      | Fixed value: `python`           |
-
-**Example Request**
-```
-curl "http://127.0.0.1:8282/sbom?repo_url=https://github.com/example/python-example&lan=python"
-```
-
-**Example Response**
-```
-{
-  "date": "2024-12-02",
-  "start_time": "16-14-28",
-  "repository": "python-example",
-  "language": "python",
-  "reporting_url": "http://localhost:5173/2024-12-02_16-14-28_python-example"
 }
 ```
 
