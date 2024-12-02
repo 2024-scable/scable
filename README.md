@@ -1,4 +1,5 @@
 # SCABLE: Start Secure Software Supply Chain with Ease!
+![SCABLE Main](https://github.com/2024-scable/scable/blob/main/scable_main.jpg)
 
 <!--배지-->
 ![MIT License][license-shield] ![Repository Size][repository-size-shield] ![Issue Closed][issue-closed-shield]
