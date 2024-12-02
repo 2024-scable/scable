@@ -36,7 +36,7 @@ SCABLE is an open-source solution that systematically and automatically analyzes
   - [Installation](#installation)
 - [[3] API Reference](#3-api-reference)
 - [[4] Usage Screenshots](#4-usage-screenshots)
-- [[5] Acknowledgement](#5-acknowledgement)
+- [[5] SCABLE's VISION](#5-scable's-vision)
 - [[6] Contact](#6-contact)
 - [[7] License](#7-license)
 
@@ -214,20 +214,34 @@ curl "http://scable.kr:8282/package-check?package_name=numppy"
 
 
 
-# [5] Acknowledgement
-***유사한 프로젝트의 레포지토리** 혹은 **블로그 포스트** 등 프로젝트 구현에 영감을 준 출처에 대해 링크를 나열하세요.*
+# [5] SCABLE's VISION
+### "SCABLE ensures the reliability and security of software supply chains, empowering organizations to manage supply chain security efficiently and systematically."
 
-- [Readme Template - Embedded Artistry](https://embeddedartistry.com/blog/2017/11/30/embedded-artistry-readme-template/)
-- [How to write a kickass Readme - James.Scott](https://dev.to/scottydocs/how-to-write-a-kickass-readme-5af9)
-- [Best-README-Template - othneildrew](https://github.com/othneildrew/Best-README-Template#prerequisites)
-- [Img Shields](https://shields.io/)
-- [Github Pages](https://pages.github.com/)
+✔️ Enhancing Transparency Across the Supply Chain
+SCABLE enables organizations to clearly understand the components of their software supply chain through **SBOM generation** and **license analysis**. By adhering to global standards, SCABLE ensures **trust and transparency**.
+
+✔️ Efficient and Practical Vulnerability Management
+With CodeQL-based analysis and typosquatting detection, SCABLE identifies critical risks in the supply chain, allowing organizations to **focus on resolving real security challenges**.
+
+✔️ Accessible and Scalable Solution
+As an **open-source and free security platform**, SCABLE provides an easy-to-use solution for managing software supply chain security, ensuring accessibility for organizations of all sizes.
+
 
 
 
 # [6] Contact
 - 📧 2024scable@gmail.com
+SCABLE is an open-source project where everyone is welcome to contribute and collaborate.
 
+We look forward to hearing from you to improve and expand the project together.
+
+Feel free to reach out for:
+ - Questions about SCABLE
+ - Suggestions for new features
+ - Reporting issues or bugs
+ - Collaboration opportunities
+   
+Let’s build a more secure software supply chain together!
 
 # [7] License
 This project is licensed under the Apache License 2.0.
