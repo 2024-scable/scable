@@ -80,9 +80,13 @@ SCABLE requires three ports for smooth operation:
 ```bash
 git clone https://github.com/2024-scable/scable
 docker compose up -d
-
+```
 
 #### 2. Direct Installation on Linux
+```bash
+apt update && apt install -y curl
+curl -s https://raw.githubusercontent.com/2024-scable/scable/main/setup.sh | bash
+```
 
 
 # [3] Usage
