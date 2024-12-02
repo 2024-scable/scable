@@ -44,12 +44,12 @@ SCABLE is an open-source solution that systematically and automatically analyzes
 
 # [1] About the Project
 
-### Why SCABLE?
+## Why SCABLE?
 - SCABLE is designed to help organizations build a secure software supply chain by automating software component analysis and license management.
 - It leverages **CodeQL Taint Analysis** to identify real security threats efficiently and focuses on supply chain security management with features like **typosquatting detection**, **license compliance**, and **real-time CI/CD integration**.
 
-### Features
-SCABLE provides six key functionalities:
+## Features
+### SCABLE provides six key functionalities:
 1. Automated SBOM generation in CycloneDX, SPDX, and SWID formats.
 2. Identification of real threats among vulnerabilities detected in SBOMs.
 3. Open-source license analysis for compliance.
@@ -57,7 +57,7 @@ SCABLE provides six key functionalities:
 5. Dashboard reporting for SBOM analysis results.
 6. Seamless CI/CD pipeline integration.
 
-### Technologies
+## Technologies
 - **[CDXGEN](https://github.com/CycloneDX/cdxgen)**: CycloneDX SBOM generation (Apache-2.0 License).
 - **[OSV-DEV](https://github.com/google/osv.dev)**: Vulnerability lookup based on OSV and NVD databases (Apache-2.0 License).
 - **[CodeQL](https://codeql.github.com/)**: Taint Analysis for identifying vulnerable components (MIT License).
@@ -68,21 +68,21 @@ SCABLE provides six key functionalities:
 
 # [2] Getting Started
 
-### Prerequisites
-SCABLE requires three ports for smooth operation:
+## Prerequisites
+### SCABLE requires three ports for smooth operation:
 - **8282**: Initial setup and SBOM generation/analysis requests.
 - **5173**: Dashboard for viewing analysis results.
 - **8080**: Used for Jenkins integration (optional).
 
-### Installation
+## Installation
 
-#### 1. Using Docker
+### 1. Using Docker
 ```bash
 git clone https://github.com/2024-scable/scable
 docker compose up -d
 ```
 
-#### 2. Direct Installation on Linux
+### 2. Direct Installation on Linux
 ```bash
 apt update && apt install -y curl
 curl -s https://raw.githubusercontent.com/2024-scable/scable/main/setup.sh | bash
