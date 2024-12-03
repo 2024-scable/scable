@@ -1,5 +1,6 @@
 from flask import Blueprint, request, render_template, redirect, url_for
 from config import Config
+
 settingsController = Blueprint("settingsController", __name__)
 
 def get_success_message(settings):
@@ -17,14 +18,6 @@ def get_success_message(settings):
     if all(slack_fields):
         configured_settings.append("Slack")
 
-    jenkins_fields = [
-        settings.get("JENKINS_URL"),
-        settings.get("JENKINS_USER"),
-        settings.get("JENKINS_API_TOKEN"),
-    ]
-    if all(jenkins_fields):
-        configured_settings.append("Jenkins")
-
     if settings.get("BLOCK_REPUTATION_THRESHOLD"):
         thresholds = ", ".join(settings["BLOCK_REPUTATION_THRESHOLD"])
         configured_settings.append(f"Reputation Threshold ({thresholds})")
@@ -37,12 +30,14 @@ def get_success_message(settings):
         return f"Configured settings: {', '.join(configured_settings)}."
     return "No settings configured."
 
+
 @settingsController.route("/settings", methods=["GET"])
 def settings():
     success = request.args.get("success", None)
     settings = Config.load_settings()
     success_message = get_success_message(settings) if success else None
     return render_template("settings.html", settings=settings, success_message=success_message)
+
 
 @settingsController.route("/update-all-settings", methods=["POST"])
 def update_all_settings():
@@ -65,9 +60,6 @@ def update_all_settings():
         "SLACK_TOKEN": new_settings.get("slack_token", [""])[0],
         "USER_TAG": new_settings.get("user_tag", [""])[0],
         "SLACK_CHANNEL_ID": new_settings.get("slack_channel_id", [""])[0],
-        "JENKINS_URL": new_settings.get("jenkins_url", [""])[0],
-        "JENKINS_USER": new_settings.get("jenkins_user", [""])[0],
-        "JENKINS_API_TOKEN": new_settings.get("jenkins_api_token", [""])[0],
         "GITHUB_API_TOKEN": github_api_token,
         "BLOCK_REPUTATION_THRESHOLD": block_reputation_threshold,
         "SKIP_REPUTATION_PACKAGES": skip_packages,
