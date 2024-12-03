@@ -258,7 +258,9 @@
             Enter package names to skip reputation check.
             <span class="example">Example: numpy, pandas, flask</span>
           </p>
-          <textarea name="skip_reputation_packages" rows="4"></textarea>
+          <textarea name="skip_reputation_packages" rows="4">
+            {{ settings.get('SKIP_REPUTATION_PACKAGES', []) | join(', ') }}
+          </textarea>
         </div>
 
         <button type="submit">Save All Settings</button>

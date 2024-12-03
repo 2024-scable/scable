@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SCABLE API Documentation</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        line-height: 1.6;
+      }
+      h1,
+      h2 {
+        color: #2c3e50;
+      }
+      h1 {
+        font-size: 2em;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 5px;
+      }
+      h2 {
+        font-size: 1.5em;
+        margin-top: 20px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+      }
+      table,
+      th,
+      td {
+        border: 1px solid #ddd;
+      }
+      th,
+      td {
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        background-color: #f4f4f4;
+      }
+      code {
+        background-color: #f9f9f9;
+        padding: 2px 4px;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>SCABLE API Documentation</h1>
+
+    <h2>1. Generate SBOM and Trace Reachable Components (`/sbom`)</h2>
+    <p>
+      This API provides SBOM in three standard formats:
+      <strong>CycloneDX</strong>, <strong>SWID</strong>, and
+      <strong>SPDX</strong>. Additionally, it traces
+      <strong>"Reachable Components"</strong> affected by the user input and
+      visualizes the analysis results on a web page.
+    </p>
+    <h3>HTTP Request</h3>
+    <pre><code>curl "http://scable.kr:8282/sbom?repo_url={repo-url}&lan=python"</code></pre>
+
+    <h3>Request Parameters</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Required</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>repo_url</code></td>
+          <td>string</td>
+          <td>Yes</td>
+          <td>The URL of the repository to analyze</td>
+        </tr>
+        <tr>
+          <td><code>lan</code></td>
+          <td>string</td>
+          <td>Yes</td>
+          <td>
+            The language of the repository (fixed value: <code>python</code>)
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>2. Check Package Reputation (`/package-check`)</h2>
+    <p>
+      This API checks the reputation of a PyPI package. It evaluates factors
+      such as the number of downloads, GitHub stars, and the potential for
+      typosquatting.
+    </p>
+    <h3>HTTP Request</h3>
+    <pre><code>curl "http://scable.kr:8282/package-check?package_name={package-name}"</code></pre>
+
+    <h3>Request Parameters</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Required</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>package_name</code></td>
+          <td>string</td>
+          <td>Yes</td>
+          <td>The name of the PyPI package to check</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>3. Settings (`/settings`)</h2>
+    <p>
+      This API allows you to configure settings such as GitHub integration,
+      reputation thresholds, and packages to skip for reputation checks.
+    </p>
+  </body>
+</html>
