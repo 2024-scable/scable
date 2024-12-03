@@ -13,6 +13,8 @@ import DashboardLibrary from "../../components/Charts/DashboardLibrary";
 interface SbomData {
     project: string;
     format: string;
+    purl: string;
+    sbomversion: string;
     version: string;
     last_update: string;
     tool: string;
@@ -126,8 +128,8 @@ const SummaryOne: React.FC = () => {
             <section className="w-full max-w-8xl bg-gradient-to-r from-blue-100 to-green-100 p-8 rounded-lg shadow-lg mb-6">
                 <div className="flex justify-between items-center">
                     <div>
-                        <h1 className="text-3xl font-extrabold text-gray-800">{sbomData.project || "N/A"}</h1>
-                        <p className="text-sm text-gray-500 mt-1">Format {sbomData.format || "N/A"}</p>
+                        <h1 className="text-3xl font-extrabold text-gray-800">{sbomData.project} ({projectName})</h1>
+                        <p className="text-sm text-gray-500 mt-1">Format {sbomData.format || "N/A"}@{sbomData.sbomversion}</p>
                         <div className="flex space-x-8 mt-4">
                             <div className="flex flex-col">
                                 <span className="text-gray-500 text-xs">Version</span>

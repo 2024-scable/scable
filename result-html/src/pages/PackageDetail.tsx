@@ -16,6 +16,12 @@ import InfoPackage from '../../src/components/Info/InfoPackage';
 import InfoVuln from '../../src/components/Info/InfoVuln';
 import References from '../../src/components/Info/References';
 
+// 새로운 License 인터페이스 정의
+interface License {
+  license_name: string;
+  license_url?: string;
+}
+
 interface Vulnerability {
   cve_id: string;
   severity: string;
@@ -45,10 +51,9 @@ interface PackageDetailProps {
   group?: string;
   name: string;
   version: string;
-  licenses: string;
-  license_urls: string;
+  licenses: License[]; // 수정: licenses를 배열로 변경
   hashes: string;
-  external_references: string; // 수정된 부분
+  external_references: string[]; // 수정: external_references를 배열로 변경
   type: string;
   ecosystem: string;
   bom_ref: string;
@@ -112,7 +117,7 @@ const PackageDetail: React.FC = () => {
       }
     };
     fetchData();
-  }, [id]);
+  }, [id, projectName]);
 
   // 즐겨찾기 상태 초기화
   useEffect(() => {
@@ -165,10 +170,13 @@ const PackageDetail: React.FC = () => {
   console.log('External References:', packageData.external_references);
   console.log('Vulnerabilities:', packageData.vulnerabilities);
 
-  // external_references가 문자열이므로, 쉼표로 분리하여 배열로 변환
-  const externalReferencesArray = packageData.external_references
-    ? packageData.external_references.split(',').map((ref: string) => ref.trim()).filter(Boolean)
-    : [];
+  // external_references가 배열이므로 별도의 처리가 필요 없을 수 있습니다.
+  // 그러나 여전히 문자열로 되어있다면 쉼표로 분리하여 배열로 변환
+  const externalReferencesArray = Array.isArray(packageData.external_references)
+    ? packageData.external_references
+    : packageData.external_references
+        ? packageData.external_references.split(',').map((ref: string) => ref.trim()).filter(Boolean)
+        : [];
 
   // vulnerabilities에서 cve_link 추출
   const vulnerabilityLinks = packageData.vulnerabilities
@@ -240,8 +248,7 @@ const PackageDetail: React.FC = () => {
           <InfoPackage
             package_check={packageData.package_check}
             ecosystem={packageData.ecosystem}
-            licenses={packageData.licenses}
-            license_urls={packageData.license_urls}
+            licenses={packageData.licenses} // 수정: licenses는 이제 배열
             hashes={packageData.hashes}
             dependencies={packageData.dependencies}
             bom_ref={packageData.bom_ref}

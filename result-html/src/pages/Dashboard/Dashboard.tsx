@@ -6,13 +6,12 @@ import ChartTwo from "../../components/Charts/ChartTwo";
 import ChatCard from "../../components/Chat/ChatCard";
 import TableOne from "../../components/Tables/TableOne";
 import SummaryOne from "../../components/Tables/SummaryOne";
-import DashboardVuln from "../../components/Charts/DashboardVuln"; // DashboardVuln ������Ʈ �߰�
+import DashboardVuln from "../../components/Charts/DashboardVuln"; 
 import DashboardLicense from '../components/Charts/DashboardLicense';
 
 const Mainpage: React.FC = () => {
     return (
         <>
-            {/* SummaryOne ������Ʈ�� �߰� */}
             <div className="grid grid-cols-1 gap-6 md:gap-8 2xl:gap-10 space-y-2">
                 <SummaryOne />
             </div>

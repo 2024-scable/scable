@@ -1,313 +1,597 @@
 ﻿// src/components/Charts/TablePackage.tsx
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 
-const TablePackage = () => {
-    const [data, setData] = useState([]);
-    const [filteredData, setFilteredData] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [filter, setFilter] = useState('ALL');
-    const [currentPage, setCurrentPage] = useState(1);
-    const [sortOrder, setSortOrder] = useState({ severity: 'asc', typeColor: 'asc', name: 'asc' });
+// TypeScript 인터페이스 정의
+interface Vulnerability {
+    cve_id: string;
+    severity: string;
+    score: string;
+    method: string;
+    vector: string;
+    cve_link: string;
+}
+
+interface PackageCheck {
+    "Risk Level": string;
+    Score?: number;
+    // 기타 필요한 필드가 있다면 추가
+}
+
+interface License {
+    license_name: string;
+    license_url?: string;
+}
+
+interface SBOMComponent {
+    unique_id: number;
+    group?: string;
+    name: string;
+    version: string;
+    ecosystem: string;
+    type?: string;
+    licenses?: License[];
+    vulnerabilities?: Vulnerability[];
+    package_check?: PackageCheck[];
+    "bom-ref"?: string;
+}
+
+type SortOrder = 'asc' | 'desc';
+
+interface SortState {
+    sortedBy: keyof SortableColumns | null; // 현재 정렬된 열
+    order: SortOrder; // 정렬 순서
+}
+
+type SortableColumns = 'name' | 'cve' | 'severity' | 'typeColor';
+
+const TablePackage: React.FC = () => {
+    const [data, setData] = useState<SBOMComponent[]>([]);
+    const [searchTerm, setSearchTerm] = useState<string>('');
+    const [filter, setFilter] = useState<string>('ALL');
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const [sortState, setSortState] = useState<SortState>({
+        sortedBy: null, // 초기에는 정렬되지 않음
+        order: 'asc',
+    });
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+
     const itemsPerPage = 50;
     const location = useLocation();
     const navigate = useNavigate();
-    const { projectName } = useParams(); // 현재 URL에서 projectName 가져오기
+    const { projectName } = useParams<{ projectName: string }>();
 
-    // 데이터 페치 및 초기 정렬
+    // 데이터 페치
     useEffect(() => {
-        fetch(`/${projectName}/sbom-detail.json`)
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Network response was not ok");
-                }
-                return response.json();
-            })
-            .then((jsonData) => {
+        if (!projectName) {
+            console.error("프로젝트 이름이 URL에 없습니다.");
+            setError("프로젝트 이름이 URL에 없습니다.");
+            setLoading(false);
+            return;
+        }
+
+        const fetchSBOMData = async () => {
+            try {
+                setLoading(true);
+                const response = await fetch(`/${projectName}/sbom-detail.json`);
+                if (!response.ok) throw new Error("Network response was not ok");
+                const jsonData = await response.json();
+
                 if (Array.isArray(jsonData.components)) {
-                    // 초기 정렬 적용
-                    const sortedData = sortData(jsonData.components, 'severity', 'asc');
-                    setData(sortedData);
-                    setFilteredData(sortedData);
+                    setData(jsonData.components);
+                    setError(null);
                 } else {
                     console.error("Expected 'components' to be an array:", jsonData);
+                    setError("데이터 형식 오류: 'components'는 배열이어야 합니다.");
                 }
-            })
-            .catch((error) => console.error("Error fetching SBOM data:", error));
-    }, []);
+            } catch (error: any) {
+                console.error("Error fetching SBOM data:", error);
+                setError(error.message || "데이터 페칭 중 오류가 발생했습니다.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchSBOMData();
+    }, [projectName, location.search]); // location.search 추가
 
     // 쿼리 파라미터에 따른 데이터 필터링
-    useEffect(() => {
-        const queryParams = new URLSearchParams(location.search);
-        const riskLevel = queryParams.get('risklevel');
-        const score = queryParams.get('score');
-        const ecosystem = queryParams.get('ecosystem');
+    const filteredData = useMemo(() => {
+        let tempData = [...data];
 
-        let filtered = data;
+        const queryParams = new URLSearchParams(location.search);
+        const riskLevel = queryParams.get('risklevel')?.toLowerCase();
+        const score = queryParams.get('score');
+        const ecosystem = queryParams.get('ecosystem')?.toLowerCase();
+
+        console.log(`Filtering with ecosystem=${ecosystem}, risklevel=${riskLevel}, score=${score}`);
 
         if (riskLevel) {
-            filtered = filtered.filter(item => {
-                const itemRiskLevel = item.package_check && item.package_check[0]?.["Risk Level"];
-                return itemRiskLevel?.toLowerCase() === riskLevel.toLowerCase();
+            tempData = tempData.filter(item => {
+                const itemRiskLevel = item.package_check?.[0]?.["Risk Level"]?.toLowerCase();
+                if (riskLevel === 'n/a') {
+                    return itemRiskLevel === 'n/a' || itemRiskLevel === 'unknown';
+                }
+                return itemRiskLevel === riskLevel;
             });
         }
 
         if (score) {
-            filtered = filtered.filter(item => {
-                const itemScore = item.package_check && item.package_check[0]?.Score;
-                return itemScore === parseInt(score, 10);
-            });
+            const parsedScore = parseInt(score, 10);
+            if (!isNaN(parsedScore)) {
+                tempData = tempData.filter(item => {
+                    const itemScore = item.package_check?.[0]?.Score;
+                    return itemScore === parsedScore;
+                });
+            }
         }
 
         if (ecosystem) {
-            filtered = filtered.filter(item => item.ecosystem?.toLowerCase() === ecosystem.toLowerCase());
+            tempData = tempData.filter(item => item.ecosystem?.toLowerCase() === ecosystem);
         }
 
-        setFilteredData(filtered);
-    }, [location, data]);
 
-    // 데이터 정렬 함수
-    const sortData = (data, type, order) => {
-        const sortedData = [...data].sort((a, b) => {
-            if (type === 'name') {
-                const nameA = a.name.toLowerCase();
-                const nameB = b.name.toLowerCase();
-                if (nameA < nameB) return order === 'asc' ? -1 : 1;
-                if (nameA > nameB) return order === 'asc' ? 1 : -1;
-                return 0;
+        return tempData;
+    }, [location.search, data]);
+
+    // 검색 및 필터링
+    const searchedData = useMemo(() => {
+        if (!searchTerm) return filteredData;
+
+        const result = filteredData.filter(item => {
+            const fullName = item.group ? `${item.group}/${item.name}` : item.name;
+            const lowerCaseSearchTerm = searchTerm.toLowerCase();
+
+            switch (filter) {
+                case 'NAME':
+                    return fullName.toLowerCase().includes(lowerCaseSearchTerm);
+                case 'LICENSE':
+                    return item.licenses?.some(lic => lic.license_name.toLowerCase().includes(lowerCaseSearchTerm)) || false;
+                case 'ECOSYSTEM':
+                    return item.ecosystem?.toLowerCase().includes(lowerCaseSearchTerm) || false;
+                case 'TYPE':
+                    return item.type?.toLowerCase().includes(lowerCaseSearchTerm) || false;
+                case 'SEVERITY':
+                    return item.vulnerabilities?.some(vuln => vuln.severity.toLowerCase().includes(lowerCaseSearchTerm)) || false;
+                case 'ALL':
+                default:
+                    return (
+                        fullName.toLowerCase().includes(lowerCaseSearchTerm) ||
+                        item.licenses?.some(lic => lic.license_name.toLowerCase().includes(lowerCaseSearchTerm)) ||
+                        item.ecosystem?.toLowerCase().includes(lowerCaseSearchTerm) ||
+                        item.type?.toLowerCase().includes(lowerCaseSearchTerm)
+                    );
             }
-            if (type === 'severity') {
-                const severityOrder = { critical: 1, high: 2, medium: 3, low: 4, none: 5 };
-                const aSeverity = a.vulnerabilities && a.vulnerabilities.length > 0 ? severityOrder[a.vulnerabilities[0].severity.toLowerCase()] : severityOrder.none;
-                const bSeverity = b.vulnerabilities && b.vulnerabilities.length > 0 ? severityOrder[b.vulnerabilities[0].severity.toLowerCase()] : severityOrder.none;
-                return order === 'asc' ? aSeverity - bSeverity : bSeverity - aSeverity;
-            }
-            if (type === 'typeColor') {
-                const getColorValue = (item) => {
-                    if (item.package_check && item.package_check[0]) {
-                        const riskLevel = item.package_check[0]["Risk Level"].toLowerCase();
-                        switch (riskLevel) {
-                            case 'red':
-                                return 1;
-                            case 'yellow':
-                                return 2;
-                            case 'green':
-                                return 3;
-                            default:
-                                return 4;
-                        }
-                    }
-                    return 4;
-                };
-                const aColor = getColorValue(a);
-                const bColor = getColorValue(b);
-                return order === 'asc' ? aColor - bColor : bColor - aColor;
-            }
-            return 0;
         });
-        return sortedData;
+
+        console.log(`Searched Data:`, result);
+        return result;
+    }, [filteredData, searchTerm, filter]);
+
+    // 정렬 로직 수정: 기본 정렬을 위험도 우선으로 변경
+    const sortedData = useMemo(() => {
+        if (sortState.sortedBy) {
+            return [...searchedData].sort((a, b) => {
+                let compare = 0;
+                switch (sortState.sortedBy) {
+                    case 'name':
+                        compare = a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+                        break;
+                    case 'cve':
+                        const aCve = a.vulnerabilities ? a.vulnerabilities.length : 0;
+                        const bCve = b.vulnerabilities ? b.vulnerabilities.length : 0;
+                        compare = aCve - bCve;
+                        break;
+                    case 'severity':
+                        const severityRank: { [key: string]: number } = {
+                            critical: 1,
+                            high: 2,
+                            medium: 3,
+                            low: 4,
+                            none: 5,
+                        };
+                        const aMaxSeverity = a.vulnerabilities && a.vulnerabilities.length > 0
+                            ? Math.min(...a.vulnerabilities.map(vuln => severityRank[vuln.severity.toLowerCase()] || severityRank['none']))
+                            : severityRank['none'];
+                        const bMaxSeverity = b.vulnerabilities && b.vulnerabilities.length > 0
+                            ? Math.min(...b.vulnerabilities.map(vuln => severityRank[vuln.severity.toLowerCase()] || severityRank['none']))
+                            : severityRank['none'];
+                        console.log(`Comparing severity: ${a.name} (${aMaxSeverity}) vs ${b.name} (${bMaxSeverity})`);
+                        compare = aMaxSeverity - bMaxSeverity;
+                        break;
+                    case 'typeColor':
+                        const getColorValue = (item: SBOMComponent): number => {
+                            const riskLevel = item.package_check?.[0]?.["Risk Level"]?.toLowerCase();
+                            switch (riskLevel) {
+                                case 'red':
+                                    return 1;
+                                case 'yellow':
+                                    return 2;
+                                case 'green':
+                                    return 3;
+                                default:
+                                    return 4;
+                            }
+                        };
+                        const aColor = getColorValue(a);
+                        const bColor = getColorValue(b);
+                        compare = aColor - bColor;
+                        break;
+                    default:
+                        break;
+                }
+
+                return sortState.order === 'asc' ? compare : -compare;
+            });
+        }
+
+        // 기본 정렬: 위험도 우선, 그 다음 취약점 개수
+        const severityRank: { [key: string]: number } = {
+            critical: 1,
+            high: 2,
+            medium: 3,
+            low: 4,
+            none: 5,
+        };
+
+        const sorted = [...searchedData].sort((a, b) => {
+            const aMaxSeverity = a.vulnerabilities && a.vulnerabilities.length > 0
+                ? Math.min(...a.vulnerabilities.map(vuln => severityRank[vuln.severity.toLowerCase()] || severityRank['none']))
+                : severityRank['none'];
+            const bMaxSeverity = b.vulnerabilities && b.vulnerabilities.length > 0
+                ? Math.min(...b.vulnerabilities.map(vuln => severityRank[vuln.severity.toLowerCase()] || severityRank['none']))
+                : severityRank['none'];
+            console.log(`Default sort - Comparing severity: ${a.name} (${aMaxSeverity}) vs ${b.name} (${bMaxSeverity})`);
+            if (aMaxSeverity !== bMaxSeverity) return aMaxSeverity - bMaxSeverity;
+
+            const aHasVuln = a.vulnerabilities ? a.vulnerabilities.length : 0;
+            const bHasVuln = b.vulnerabilities ? b.vulnerabilities.length : 0;
+            if (aHasVuln !== bHasVuln) return bHasVuln - aHasVuln;
+
+            const nameCompare = a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+            if (nameCompare !== 0) return nameCompare;
+
+            const getColorValue = (item: SBOMComponent): number => {
+                const riskLevel = item.package_check?.[0]?.["Risk Level"]?.toLowerCase();
+                switch (riskLevel) {
+                    case 'red':
+                        return 1;
+                    case 'yellow':
+                        return 2;
+                    case 'green':
+                        return 3;
+                    default:
+                        return 4;
+                }
+            };
+            const aColor = getColorValue(a);
+            const bColor = getColorValue(b);
+            return aColor - bColor;
+        });
+
+        return sorted;
+    }, [searchedData, sortState]);
+
+    // 페이징 처리
+    const paginatedData = useMemo(() => {
+        const indexOfLastItem = currentPage * itemsPerPage;
+        const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+        return sortedData.slice(indexOfFirstItem, indexOfLastItem);
+    }, [sortedData, currentPage]);
+
+    const totalPages = useMemo(() => {
+        return Math.ceil(sortedData.length / itemsPerPage);
+    }, [sortedData.length]);
+
+    // 페이지 번호 생성
+    const getPageNumbers = (): number[] => {
+        const visiblePages = 5;
+        let startPage = Math.max(1, currentPage - Math.floor(visiblePages / 2));
+        let endPage = startPage + visiblePages - 1;
+
+        if (endPage > totalPages) {
+            endPage = totalPages;
+            startPage = Math.max(1, endPage - visiblePages + 1);
+        }
+
+        return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
+    };
+
+    // 위험 수준 색상 매핑
+    const getRiskLevelColor = (riskLevel?: string): string => {
+        switch (riskLevel?.toLowerCase()) {
+            case 'red':
+                return 'text-red-600';
+            case 'yellow':
+                return 'text-yellow-500';
+            case 'green':
+                return 'text-green-600';
+            case 'unknown':
+                return 'text-gray-500';
+            default:
+                return 'text-gray-500';
+        }
+    };
+
+    // 취약성 심각도 색상 매핑
+    const getSeverityColor = (severity?: string): string => {
+        switch (severity?.toLowerCase()) {
+            case 'critical':
+                return 'text-red-600';
+            case 'high':
+                return 'text-orange-500';
+            case 'medium':
+                return 'text-yellow-500';
+            case 'low':
+                return 'text-green-600';
+            default:
+                return 'text-gray-500';
+        }
     };
 
     // 정렬 이벤트 핸들러
-    const handleSort = (type) => {
-        const order = sortOrder[type] === 'asc' ? 'desc' : 'asc';
-        const sortedData = sortData(filteredData, type, order);
-        setFilteredData(sortedData);
-        setSortOrder({ ...sortOrder, [type]: order });
+    const handleSort = (type: keyof SortableColumns) => {
+        setSortState(prev => ({
+            sortedBy: type,
+            order: prev.sortedBy === type && prev.order === 'asc' ? 'desc' : 'asc',
+        }));
     };
 
     // 검색 이벤트 핸들러
-    const handleSearch = (event) => {
-        setSearchTerm(event.target.value);
+    const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(event.target.value.toLowerCase());
+        setCurrentPage(1); // 검색 시 페이지 초기화
     };
 
     // 필터 변경 핸들러
-    const handleFilterChange = (event) => {
+    const handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setFilter(event.target.value);
+        setSearchTerm('');
+        setCurrentPage(1); // 필터 변경 시 페이지 초기화
     };
 
     // 페이지 변경 핸들러
-    const handlePageChange = (pageNumber) => {
+    const handlePageChange = (pageNumber: number) => {
+        if (pageNumber < 1 || pageNumber > totalPages) return;
         setCurrentPage(pageNumber);
     };
 
-    // 데이터 필터링 및 페이징 처리
-    const filteredResults = filteredData.filter((item) => {
-        const lowerCaseSearchTerm = searchTerm.toLowerCase();
-        const fullName = item.group ? `${item.group}/${item.name}` : item.name;
-
-        if (filter === 'ALL') {
-            return (
-                fullName.toLowerCase().includes(lowerCaseSearchTerm) ||
-                (item.licenses && item.licenses.toLowerCase().includes(lowerCaseSearchTerm)) ||
-                (item.ecosystem && item.ecosystem.toLowerCase().includes(lowerCaseSearchTerm)) ||
-                (item.type && item.type.toLowerCase().includes(lowerCaseSearchTerm))
-            );
-        }
-
-        switch (filter) {
-            case 'NAME':
-                return fullName.toLowerCase().includes(lowerCaseSearchTerm);
-            case 'LICENSE':
-                return item.licenses && item.licenses.toLowerCase().includes(lowerCaseSearchTerm);
-            case 'ECOSYSTEM':
-                return item.ecosystem && item.ecosystem.toLowerCase().includes(lowerCaseSearchTerm);
-            case 'TYPE':
-                return item.type && item.type.toLowerCase().includes(lowerCaseSearchTerm);
-            case 'SEVERITY':
-                return item.vulnerabilities && item.vulnerabilities.some(vuln => vuln.severity.toLowerCase().includes(lowerCaseSearchTerm));
-            default:
-                return true;
-        }
-    });
-
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentData = filteredResults.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(filteredResults.length / itemsPerPage);
-    const visiblePageNumbers = 5;
-    const startPage = Math.max(1, currentPage - Math.floor(visiblePageNumbers / 2));
-    const endPage = Math.min(totalPages, startPage + visiblePageNumbers - 1);
-
+    // 렌더링
     return (
-        <div className="rounded-sm bg-white px-5 pt-6 pb-4  dark:bg-boxdark sm:px-7 xl:pb-1 text-base">
-            <div className="mb-4 flex items-center gap-2">
-                <select value={filter} onChange={handleFilterChange} className="p-2 border border-gray-300 rounded text-sm">
-                    <option value="ALL">ALL</option>
-                    <option value="NAME">NAME</option>
-                    <option value="LICENSE">LICENSE</option>
-                    <option value="ECOSYSTEM">ECOSYSTEM</option>
-                    <option value="TYPE">TYPE</option>
-                    <option value="SEVERITY">SEVERITY</option>
-                </select>
-                <input
-                    type="text"
-                    placeholder={`Search by ${filter.toLowerCase()}...`}
-                    value={searchTerm}
-                    onChange={handleSearch}
-                    className="p-2 border border-gray-300 rounded flex-1 text-sm"
-                />
-            </div>
+        <div className="rounded-sm bg-white px-5 pt-6 pb-4 dark:bg-boxdark sm:px-7 xl:pb-1 text-base">
+            {/* 로딩 및 오류 상태 처리 */}
+            {loading ? (
+                <div className="flex justify-center items-center h-full">
+                    <p>Loading...</p>
+                </div>
+            ) : error ? (
+                <div className="flex justify-center items-center h-full">
+                    <p className="text-red-500">{error}</p>
+                </div>
+            ) : (
+                <>
+                    {/* 검색 및 필터링 섹션 */}
+                    <div className="mb-4 flex flex-col md:flex-row items-center gap-2">
+                        <select
+                            value={filter}
+                            onChange={handleFilterChange}
+                            className="p-2 border border-gray-300 rounded text-sm"
+                        >
+                            <option value="ALL">ALL</option>
+                            <option value="NAME">NAME</option>
+                            <option value="LICENSE">LICENSE</option>
+                            <option value="ECOSYSTEM">ECOSYSTEM</option>
+                            <option value="TYPE">TYPE</option>
+                            <option value="SEVERITY">SEVERITY</option>
+                        </select>
+                        <input
+                            type="text"
+                            placeholder={`Search by ${filter.toLowerCase()}...`}
+                            value={searchTerm}
+                            onChange={handleSearch}
+                            className="p-2 border border-gray-300 rounded flex-1 text-sm"
+                        />
+                    </div>
 
-            <table className="min-w-full bg-white table-fixed text-sm">
-                <thead>
-                    <tr>
-                        <th className="py-3 px-3 text-center w-12">No.</th>
-                        <th className="py-3 px-3 text-left cursor-pointer w-36" onClick={() => handleSort('name')}>
-                            Name
-                            <span className="ml-2 text-xs">
-                                {sortOrder.name === 'asc' ? '▲' : '▼'}
-                            </span>
-                        </th>
-                        <th className="py-3 px-3 text-center w-20">Version</th>
-                        <th className="py-3 px-3 text-center w-28">Ecosystem</th>
-                        <th className="py-3 px-3 text-center w-24 cursor-pointer" onClick={() => handleSort('typeColor')}>
-                            Type
-                            <span className="ml-2 text-xs">
-                                {sortOrder.typeColor === 'asc' ? '▲' : '▼'}
-                            </span>
-                        </th>
-                        <th className="py-3 px-3 text-center w-28">License</th>
-                        <th className="py-3 px-3 text-center w-24 cursor-pointer" onClick={() => handleSort('severity')}>
-                            Vulnerability
-                            <span className="ml-2 text-xs">
-                                {sortOrder.severity === 'asc' ? '▲' : '▼'}
-                            </span>
-                        </th>
-                        <th className="py-3 px-3 text-center w-24 cursor-pointer" onClick={() => handleSort('severity')}>
-                            Severity
-                            <span className="ml-2 text-xs">
-                                {sortOrder.severity === 'asc' ? '▲' : '▼'}
-                            </span>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {currentData.map((item, index) => {
-                        let typeColor = 'black';
-                        if (item.package_check && item.package_check[0]) {
-                            const riskLevel = item.package_check[0]["Risk Level"];
-                            if (riskLevel.toLowerCase() === 'green') typeColor = 'green';
-                            if (riskLevel.toLowerCase() === 'yellow') typeColor = '#FFCA28';
-                            if (riskLevel.toLowerCase() === 'red') typeColor = 'red';
-                        }
-
-                        return (
-                            <tr key={item.unique_id || item["bom-ref"] || index}>
-                                <td className="py-3 px-3 text-center">{indexOfFirstItem + index + 1}</td>
-                                <td className="py-3 px-3 text-left">
-                                    <span
-                                        className="text-blue-500 hover:underline cursor-pointer"
-                                        onClick={() => {
-                                            if (projectName) {
-                                                navigate(`/${projectName}/components/${item.unique_id}`);
-                                            } else {
-                                                console.error('projectName is not defined in URL');
-                                            }
-                                        }}
+                    {/* 패키지 테이블 */}
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full bg-white table-fixed text-sm">
+                            <thead>
+                                <tr className="border-b bg-[#d2e3fe] dark:bg-gray-800">
+                                    <th className="py-3 px-3 text-center w-12">No.</th>
+                                    <th
+                                        className="py-3 px-3 text-left cursor-pointer w-36"
+                                        onClick={() => handleSort('name')}
                                     >
-                                        {item.group ? `${item.group}/${item.name}` : item.name}
-                                    </span>
-                                </td>
-                                <td className="py-3 px-3 text-center">{item.version}</td>
-                                <td className="py-3 px-3 text-center">{item.ecosystem}</td>
-                                <td className="py-3 px-3 text-center" style={{ color: typeColor }}>{item.type || 'N/A'}</td>
-                                <td className="py-3 px-3 text-center">{item.licenses}</td>
-                                <td className="py-3 px-3 text-center">
-                                    {item.vulnerabilities ? item.vulnerabilities.map((vuln, i) => (
-                                        <div key={i}>{vuln.cve_id}</div>
-                                    )) : 'N/A'}
-                                </td>
-                                <td className="py-3 px-3 text-center">
-                                    {item.vulnerabilities ? item.vulnerabilities.map((vuln, i) => {
-                                        let severityColor = 'black';
-                                        switch (vuln.severity.toLowerCase()) {
-                                            case 'critical':
-                                                severityColor = 'red';
-                                                break;
-                                            case 'high':
-                                                severityColor = 'orange';
-                                                break;
-                                            case 'medium':
-                                                severityColor = '#FFCA28';
-                                                break;
-                                            case 'low':
-                                                severityColor = 'green';
-                                                break;
-                                            default:
-                                                severityColor = 'black';
-                                        }
+                                        Name
+                                        <span className="ml-2 text-xs">
+                                            {sortState.sortedBy === 'name' ? (sortState.order === 'asc' ? '▲' : '▼') : ''}
+                                        </span>
+                                    </th>
+                                    <th className="py-3 px-3 text-center w-20">Version</th>
+                                    <th className="py-3 px-3 text-center w-28">Ecosystem</th>
+                                    <th
+                                        className="py-3 px-3 text-center w-24 cursor-pointer"
+                                        onClick={() => handleSort('typeColor')}
+                                    >
+                                        Type
+                                        <span className="ml-2 text-xs">
+                                            {sortState.sortedBy === 'typeColor' ? (sortState.order === 'asc' ? '▲' : '▼') : ''}
+                                        </span>
+                                    </th>
+                                    <th className="py-3 px-3 text-center w-28">License</th>
+                                    <th
+                                        className="py-3 px-3 text-center w-24 cursor-pointer"
+                                        onClick={() => handleSort('cve')}
+                                    >
+                                        Vulnerability
+                                        <span className="ml-2 text-xs">
+                                            {sortState.sortedBy === 'cve' ? (sortState.order === 'asc' ? '▲' : '▼') : ''}
+                                        </span>
+                                    </th>
+                                    <th
+                                        className="py-3 px-3 text-center w-24 cursor-pointer"
+                                        onClick={() => handleSort('severity')}
+                                    >
+                                        Severity
+                                        <span className="ml-2 text-xs">
+                                            {sortState.sortedBy === 'severity' ? (sortState.order === 'asc' ? '▲' : '▼') : ''}
+                                        </span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {paginatedData.length > 0 ? (
+                                    paginatedData.map((item, index) => {
+                                        const riskLevel = item.package_check?.[0]?.["Risk Level"];
                                         return (
-                                            <div key={i} style={{ color: severityColor }}>
-                                                {vuln.severity}
-                                            </div>
+                                            <tr key={item.unique_id || item["bom-ref"] || index} className="border-b hover:bg-[#dddddd] dark:hover:bg-gray-800">
+                                                <td className="py-3 px-3 text-center">{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                                                <td className="py-3 px-3 text-left">
+                                                    <span
+                                                        className="text-blue-500 hover:underline cursor-pointer"
+                                                        onClick={() => {
+                                                            if (projectName) {
+                                                                navigate(`/${projectName}/components/${item.unique_id}`);
+                                                            } else {
+                                                                console.error('projectName is not defined in URL');
+                                                            }
+                                                        }}
+                                                    >
+                                                        {item.group ? `${item.group}/${item.name}` : item.name}
+                                                    </span>
+                                                </td>
+                                                <td className="py-3 px-3 text-center">{item.version}</td>
+                                                <td className="py-3 px-3 text-center">{item.ecosystem}</td>
+                                                <td className="py-3 px-3 text-center" style={{ color: getRiskLevelColor(riskLevel) }}>
+                                                    {item.type || 'N/A'}
+                                                </td>
+                                                <td className="py-3 px-3 text-center">
+                                                    {item.licenses && item.licenses.length > 0 ? (
+                                                        item.licenses.map((lic, i) => (
+                                                            lic.license_name.toLowerCase() === 'n/a' || !lic.license_url ? (
+                                                                <div key={i} className="text-gray-500">
+                                                                    {lic.license_name}
+                                                                </div>
+                                                            ) : (
+                                                                <div key={i}>
+                                                                    <a href={lic.license_url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                                                                        {lic.license_name}
+                                                                    </a>
+                                                                </div>
+                                                            )
+                                                        ))
+                                                    ) : (
+                                                        'N/A'
+                                                    )}
+                                                </td>
+                                                <td className="py-3 px-3 text-center">
+                                                    {item.vulnerabilities && item.vulnerabilities.length > 0 ? (
+                                                        // 취약성 리스트를 심각도 높은 순으로 정렬하여 표시
+                                                        [...item.vulnerabilities].sort((a, b) => {
+                                                            const severityOrder: { [key: string]: number } = {
+                                                                critical: 1,
+                                                                high: 2,
+                                                                medium: 3,
+                                                                low: 4,
+                                                                none: 5,
+                                                            };
+                                                            const aSeverity = severityOrder[a.severity.toLowerCase()] || severityOrder['none'];
+                                                            const bSeverity = severityOrder[b.severity.toLowerCase()] || severityOrder['none'];
+                                                            return aSeverity - bSeverity;
+                                                        }).map((vuln, i) => (
+                                                            <div key={i}>{vuln.cve_id}</div>
+                                                        ))
+                                                    ) : (
+                                                        ''
+                                                    )}
+                                                </td>
+                                                <td className="py-3 px-3 text-center">
+                                                    {item.vulnerabilities && item.vulnerabilities.length > 0 ? (
+                                                        // 취약성 리스트를 심각도 높은 순으로 정렬하여 표시
+                                                        [...item.vulnerabilities].sort((a, b) => {
+                                                            const severityOrder: { [key: string]: number } = {
+                                                                critical: 1,
+                                                                high: 2,
+                                                                medium: 3,
+                                                                low: 4,
+                                                                none: 5,
+                                                            };
+                                                            const aSeverity = severityOrder[a.severity.toLowerCase()] || severityOrder['none'];
+                                                            const bSeverity = severityOrder[b.severity.toLowerCase()] || severityOrder['none'];
+                                                            return aSeverity - bSeverity;
+                                                        }).map((vuln, i) => (
+                                                            <div key={i} className={getSeverityColor(vuln.severity)}>
+                                                                {vuln.severity}
+                                                            </div>
+                                                        ))
+                                                    ) : (
+                                                        ''
+                                                    )}
+                                                </td>
+                                            </tr>
                                         );
-                                    }) : 'N/A'}
-                                </td>
-                            </tr>
-                        );
-                    })}
-                </tbody>
-            </table>
+                                    })
+                                ) : (
+                                    <tr>
+                                        <td colSpan={8} className="py-4 text-center text-gray-500">
+                                            No data available.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
 
-            <div className="flex justify-center mt-4 space-x-2 text-sm">
-                <button onClick={() => handlePageChange(1)} className="px-3 py-1 border rounded" disabled={currentPage === 1}>«</button>
-                <button onClick={() => handlePageChange(Math.max(1, currentPage - 1))} className="px-3 py-1 border rounded" disabled={currentPage === 1}>‹</button>
-                {Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map((pageNumber) => (
-                    <button
-                        key={pageNumber}
-                        onClick={() => handlePageChange(pageNumber)}
-                        className={`px-3 py-1 border rounded ${pageNumber === currentPage ? 'underline font-bold' : ''}`}
-                    >
-                        {pageNumber}
-                    </button>
-                ))}
-                <button onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))} className="px-3 py-1 border rounded" disabled={currentPage === totalPages}>›</button>
-                <button onClick={() => handlePageChange(totalPages)} className="px-3 py-1 border rounded" disabled={currentPage === totalPages}>»</button>
-            </div>
+                    {/* 페이징 네비게이션 */}
+                    {totalPages > 1 && (
+                        <div className="flex justify-center mt-4 space-x-2 text-sm">
+                            <button
+                                onClick={() => handlePageChange(1)}
+                                className="px-3 py-1 border rounded disabled:opacity-50"
+                                disabled={currentPage === 1}
+                            >
+                                «
+                            </button>
+                            <button
+                                onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                                className="px-3 py-1 border rounded disabled:opacity-50"
+                                disabled={currentPage === 1}
+                            >
+                                ‹
+                            </button>
+                            {getPageNumbers().map(pageNumber => (
+                                <button
+                                    key={pageNumber}
+                                    onClick={() => handlePageChange(pageNumber)}
+                                    className={`px-3 py-1 border rounded ${pageNumber === currentPage ? 'underline font-bold' : ''}`}
+                                >
+                                    {pageNumber}
+                                </button>
+                            ))}
+                            <button
+                                onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                                className="px-3 py-1 border rounded disabled:opacity-50"
+                                disabled={currentPage === totalPages}
+                            >
+                                ›
+                            </button>
+                            <button
+                                onClick={() => handlePageChange(totalPages)}
+                                className="px-3 py-1 border rounded disabled:opacity-50"
+                                disabled={currentPage === totalPages}
+                            >
+                                »
+                            </button>
+                        </div>
+                    )}
+                </>
+            )}
         </div>
     );
+
 };
 
 export default TablePackage;

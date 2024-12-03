@@ -245,72 +245,7 @@ const ChartLibrary: React.FC = () => {
         </table>
       </div>
 
-      {/* *** 불필요한 차트 섹션 제거 *** */}
-      {/* 에코시스템별 위험도 분포 차트 제거 */}
-      {/*
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {ecosystems.map((ecosystem, index) => {
-          const counts = getEcosystemRiskCounts(ecosystem);
-          const pieData = [
-            { name: "Red", value: counts.Red, color: "#E74C3C" },
-            { name: "Yellow", value: counts.Yellow, color: "#F1C40F" },
-            { name: "Green", value: counts.Green, color: "#2ECC71" },
-          ];
-
-          // 위험도 값이 모두 0인 경우 차트를 표시하지 않음
-          const totalRisk = counts.Red + counts.Yellow + counts.Green;
-          if (totalRisk === 0) return null;
-
-          return (
-            <div
-              key={index}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow p-6"
-            >
-              <h3 className="text-center text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4">
-                {ecosystem.toUpperCase()} Risk Distribution
-              </h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    dataKey="value"
-                    nameKey="name"
-                    innerRadius={60}
-                    outerRadius={100}
-                    paddingAngle={5}
-                    label={({ name, percent }) =>
-                      `${name} ${(percent * 100).toFixed(0)}%`
-                    }
-                    onClick={(data, index) =>
-                      handleChartClick(ecosystem, data.name)
-                    }
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={entry.color}
-                        cursor="pointer"
-                      />
-                    ))}
-                  </Pie>
-                  <Legend
-                    verticalAlign="bottom"
-                    height={36}
-                    payload={pieData.map((item) => ({
-                      value: item.name,
-                      type: "square",
-                      id: item.name,
-                      color: item.color,
-                    }))}
-                  />
-                  <Tooltip formatter={(value: number) => `${value}`} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          );
-        })}
-      </div>
-      */}
+      
     </div>
   );
 };

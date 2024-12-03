@@ -5,6 +5,7 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import SidebarLinkGroup from './SidebarLinkGroup';
 import Logo from '../../images/logo/logo.png';
 import useProjects, { Project } from '../../hooks/useProjects';
+import { FaCog } from 'react-icons/fa'; // FaCog 아이콘 임포트
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -28,7 +29,7 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
   const { groupedProjects, sortedProjectNames, loading, error } = useProjects();
   const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set());
 
-  // close on click outside
+  // 클릭 외부 닫기
   useEffect(() => {
     const clickHandler = ({ target }: MouseEvent) => {
       if (!sidebar.current || !trigger.current) return;
@@ -44,7 +45,7 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
     return () => document.removeEventListener('click', clickHandler);
   }, [sidebarOpen, setSidebarOpen]);
 
-  // close if the esc key is pressed
+  // Esc 키로 사이드바 닫기
   useEffect(() => {
     const keyHandler = ({ key }: KeyboardEvent) => {
       if (!sidebarOpen || key !== 'Escape') return;
@@ -205,12 +206,14 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
             />
           </svg>
         </button>
+        
       </div>
+      
       {/* SIDEBAR HEADER */}
 
       <div className="flex flex-col overflow-y-auto px-4 lg:px-6">
         {/* Sidebar Menu */}
-        <nav className="mt-5 lg:mt-9">
+        <nav className="mt-5 lg:mt-5">
           {/* 프로젝트 그룹화 및 정렬된 이름 순으로 반복 */}
           {sortedProjectNames.map((projectName, index) => {
             const projectGroup = groupedProjects[projectName];
@@ -328,6 +331,7 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
                                   DependencyTree
                                 </NavLink>
                               </li>
+                              
                             </ul>
                           </div>
                         </>
@@ -341,6 +345,19 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
         </nav>
         {/* Sidebar Menu */}
       </div>
+      {/* Settings Menu fixed at bottom */}
+      <div className="border-t border-gray-200 p-4">
+          <a
+            href="http://127.0.0.1:8282/settings"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2.5 rounded-md px-4 py-2 text-base font-bold text-gray-600 hover:text-gray-800"
+            aria-label="Settings 페이지로 이동"
+          >
+            <FaCog className="h-5 w-5 text-gray-600" />
+            Settings
+          </a>
+        </div>
     </aside>
   );
 };

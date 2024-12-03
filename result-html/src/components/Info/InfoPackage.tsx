@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { FaShieldAlt, FaLink, FaHashtag, FaCodeBranch } from 'react-icons/fa';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom'; // Link 대신 useNavigate 사용
 
 interface PackageCheck {
   full_name: string;
@@ -12,16 +12,22 @@ interface PackageCheck {
   "Warning Reasons": { [key: string]: string } | null;
 }
 
+interface License {
+  license_name: string;
+  license_url?: string;
+}
+
 interface ComponentData {
   package_check?: PackageCheck[];
   ecosystem?: string;
-  licenses?: string;
-  license_urls?: string;
+  licenses?: License[]; // licenses는 이제 객체의 배열
   hashes?: string;
   dependencies?: string;
   external_references?: string | string[];
   full_name?: string;
   unique_id?: number;
+  purl?: string; // purl 추가
+  bomref?: string; // bomref 추가
 }
 
 interface RiskIndicator {
@@ -78,12 +84,12 @@ const getTyposquattingText = (suspected: string): string => {
 };
 
 const InfoPackage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id, projectName } = useParams<{ id: string; projectName: string }>();
+  const navigate = useNavigate(); // useNavigate 초기화
   const [componentData, setComponentData] = useState<ComponentData | null>(null);
+  const [allComponents, setAllComponents] = useState<ComponentData[]>([]); // 모든 컴포넌트 상태 추가
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const { projectName } = useParams();
-
 
   useEffect(() => {
     if (!id) {
@@ -100,6 +106,7 @@ const InfoPackage: React.FC = () => {
         return response.json();
       })
       .then((data) => {
+        setAllComponents(data.components); // 모든 컴포넌트 저장
         const targetComponent = data.components.find(
           (component: ComponentData) => String(component.unique_id) === id
         );
@@ -115,7 +122,7 @@ const InfoPackage: React.FC = () => {
         setError(`Error fetching JSON: ${error.message}`);
         setLoading(false);
       });
-  }, [id]);
+  }, [id, projectName]);
 
   if (loading) {
     return <div className="text-center text-gray-700">로딩 중...</div>;
@@ -129,7 +136,6 @@ const InfoPackage: React.FC = () => {
     package_check,
     ecosystem,
     licenses,
-    license_urls,
     hashes,
     dependencies,
     external_references,
@@ -153,6 +159,14 @@ const InfoPackage: React.FC = () => {
         .filter((ref) => ref !== '');
     }
   }
+
+  // 디펜던시의 unique_id를 찾는 함수 내부로 이동 및 purl 기준으로 수정
+  const findUniqueIdByDependency = (depPurl: string, allComponents: ComponentData[]): number | null => {
+    const foundComponent = allComponents.find(
+      (component) => component.purl?.toLowerCase() === depPurl.toLowerCase()
+    );
+    return foundComponent ? foundComponent.unique_id || null : null;
+  };
 
   return (
     <div className="p-8 space-y-8">
@@ -181,7 +195,7 @@ const InfoPackage: React.FC = () => {
                 <div>
                   <p className="text-sm text-gray-600">Typosquatting Suspected </p>
                   <p className="text-xl text-gray-800 font-semibold">
-                    &nbsp;{check["Typosquatting Suspected"]}
+                    &nbsp;{getTyposquattingText(check["Typosquatting Suspected"])}
                   </p>
                 </div>
                 <div></div>
@@ -224,15 +238,27 @@ const InfoPackage: React.FC = () => {
             <FaLink className="text-gray-700 mr-3 text-lg mt-1" />
             <div>
               <p className="text-sm text-gray-600">License</p>
-              {licenses && license_urls ? (
-                <a
-                  href={license_urls}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-base text-blue-600 font-medium hover:underline"
-                >
-                  {licenses}
-                </a>
+              {licenses && licenses.length > 0 ? (
+                // 라이선스가 배열 형태로 제공될 때 처리
+                <ul className="list-disc pl-5 mt-2 text-base text-gray-800">
+                  {licenses.map((license, idx) => (
+                    <li key={idx} className="mb-1">
+                      {license.license_url ? (
+                        <a
+                          href={license.license_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 font-medium hover:underline"
+                          aria-label={`License: ${license.license_name}`}
+                        >
+                          {license.license_name}
+                        </a>
+                      ) : (
+                        <span className="text-gray-800 font-medium">{license.license_name}</span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
               ) : (
                 <p className="text-base text-gray-800 font-medium">No License Information</p>
               )}
@@ -261,9 +287,9 @@ const InfoPackage: React.FC = () => {
                       href={ref}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-base text-blue-600 font-medium hover:underline"
+                      className="text-base text-blue-600 font-medium hover:underline break-all"
                     >
-                      {ref}<br></br>
+                      {ref}
                     </a>
                   ))
                 ) : (
@@ -282,11 +308,37 @@ const InfoPackage: React.FC = () => {
           <div>
             <p className="text-sm text-gray-600">Dependencies</p>
             {formattedDependencies.length > 0 ? (
-              <ul className="list-disc pl-5 mt-2 text-base text-gray-800 grid grid-cols-2 gap-2">
-                {formattedDependencies.map((dep, idx) => (
-                  <li key={idx}>{dep}</li>
-                ))}
-              </ul>
+              // 디펜던시가 여러 개인 경우 Flexbox로 처리하여 겹치지 않도록 함
+              <div className="mt-2 flex flex-wrap gap-2">
+                {formattedDependencies.map((dep, idx) => {
+                  const uniqueId = findUniqueIdByDependency(dep, allComponents);
+                  return uniqueId ? (
+                    <button
+                      key={idx}
+                      onClick={() => {
+                        if (projectName && uniqueId) {
+                          navigate(`/${projectName}/components/${uniqueId}`);
+                        } else {
+                          console.error('projectName or uniqueId is not defined');
+                        }
+                      }}
+                      className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm hover:bg-indigo-200 transition-colors duration-200 cursor-pointer"
+                      aria-label={`Navigate to package details of ${dep}`}
+                    >
+                      {dep}
+                    </button>
+                  ) : (
+                    // unique_id가 없는 경우 클릭 불가하게 표시
+                    <span
+                      key={idx}
+                      className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm cursor-default"
+                      title="No detailed information available"
+                    >
+                      {dep}
+                    </span>
+                  );
+                })}
+              </div>
             ) : (
               <p className="text-base text-gray-800 font-medium mt-2">No Dependencies</p>
             )}

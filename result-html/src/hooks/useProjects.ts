@@ -28,33 +28,39 @@ const useProjects = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data: DirectoryData = await response.json();
+
+        if (!data.directories || data.directories.length === 0) {
+          console.warn('No directories found.');
+          setProjects([]); // 빈 배열로 설정
+          setLoading(false);
+          return;
+        }
+
         const parsedProjects: Project[] = data.directories.map((dir) => {
           const parts = dir.split('_');
-          if (parts.length < 3) { // 최소 3개 부분: date, time, projectName
+          if (parts.length < 3) {
             console.warn(`Invalid directory format: ${dir}`);
             return null;
           }
           const date = parts[0];
-          const timeFull = parts[1];
-          const projectName = parts.slice(2).join('_'); // 프로젝트명이 언더스코어를 포함할 수 있음
-
-          const createdAt = `${date} ${timeFull}`; // 'YYYY-MM-DD HH:MM:SS'
+          const timeFull = parts[1].replace(/-/g, ':'); // 시간 포맷 정리
+          const projectName = parts.slice(2).join('_');
 
           return {
             id: dir,
             name: projectName,
-            createdAt,
-            date,      // 추가
-            time: timeFull, // 추가
-            status: 'Active', // 상태는 필요에 따라 설정
+            createdAt: `${date} ${timeFull}`,
+            date,
+            time: timeFull,
+            status: 'Active',
           };
         }).filter((proj): proj is Project => proj !== null);
 
         setProjects(parsedProjects);
-        setLoading(false);
       } catch (err) {
         console.error('Error fetching directories:', err);
-        setError('프로젝트 데이터를 불러오는 데 실패했습니다.');
+        setError(null); // 에러 메시지 비활성화
+      } finally {
         setLoading(false);
       }
     };
@@ -62,19 +68,14 @@ const useProjects = () => {
     fetchDirectories();
   }, []);
 
-  // 프로젝트 데이터를 이름별로 그룹화
-  const groupedProjects = projects.reduce(
-    (result: { [key: string]: Project[] }, project) => {
-      if (!result[project.name]) {
-        result[project.name] = [];
-      }
-      result[project.name].push(project);
-      return result;
-    },
-    {}
-  );
+  const groupedProjects = projects.reduce((result, project) => {
+    if (!result[project.name]) {
+      result[project.name] = [];
+    }
+    result[project.name].push(project);
+    return result;
+  }, {} as { [key: string]: Project[] });
 
-  // 프로젝트 이름 배열 (생성일자 기준으로 정렬, 최신이 위로)
   const sortedProjectNames = Object.keys(groupedProjects).sort((a, b) => {
     const latestA = new Date(groupedProjects[a][0].createdAt).getTime();
     const latestB = new Date(groupedProjects[b][0].createdAt).getTime();
@@ -85,3 +86,5 @@ const useProjects = () => {
 };
 
 export default useProjects;
+
+
