@@ -1,11 +1,9 @@
 import json
-import os
 import sys
 
 def load_json_data(json_file_path):
     with open(json_file_path, 'r', encoding='utf-8') as json_file:
         return json.load(json_file)
-
 
 def extract_components_data(data):
     unique_components = set()
@@ -20,23 +18,29 @@ def extract_components_data(data):
         dependencies_dict = {dep['ref']: dep.get('dependsOn', []) for dep in dependencies}
 
         for component in components:
-            group = component.get('group', 'N/A')
+            group = component.get('group', '')
             name = component.get('name', 'N/A')
             version = component.get('version', 'N/A')
             scope = component.get('scope', 'N/A')
-            licenses = ', '.join(
-                [license_info.get('license', {}).get('id', 'N/A') for license_info in component.get('licenses', [])])
-            license_urls = ', '.join(
-                [license_info.get('license', {}).get('url', 'N/A') for license_info in component.get('licenses', [])])
-            type_ = component.get('type', 'N/A')
-            purl = component.get('purl', 'N/A')
-            bom_ref = component.get('bom-ref', 'N/A')
 
+            licenses = []
+            for license_info in component.get('licenses', []):
+                license_data = license_info.get('license', {})
+                license_name = license_data.get('id', license_data.get('name', 'N/A'))
+                license_url = license_data.get('url', 'N/A')
+
+                licenses.append({
+                    "license_name": license_name,
+                    "license_url": license_url
+                })
+
+            license_urls = ', '.join([lic["license_url"] for lic in licenses if lic["license_url"] != "N/A"])
             hashes = ', '.join([f"{hash_info.get('alg', 'N/A')}: {hash_info.get('content', 'N/A')}" for hash_info in
                                 component.get('hashes', [])])
             external_references = ', '.join([ref.get('url', 'N/A') for ref in component.get('externalReferences', []) if
                                              ref.get('url', '').startswith("https")])
 
+            purl = component.get('purl', 'N/A')
             if "npm" in purl:
                 ecosystem = "npm"
             elif "github" in purl:
@@ -51,7 +55,7 @@ def extract_components_data(data):
             component_vulnerabilities = []
             for vulnerability in vulnerabilities:
                 for affected in vulnerability.get('affects', []):
-                    if affected.get('ref') == bom_ref:
+                    if affected.get('ref') == component.get('bom-ref', 'N/A'):
                         cve_id = vulnerability.get('id', 'N/A')
                         ratings = vulnerability.get('ratings', [])
 
@@ -78,11 +82,10 @@ def extract_components_data(data):
                             "published": published
                         })
 
-            dependencies_list = dependencies_dict.get(bom_ref, [])
+            dependencies_list = dependencies_dict.get(component.get('bom-ref', 'N/A'), [])
             dependencies_str = ', '.join(dependencies_list) if dependencies_list else 'None'
 
             unique_key = (group, name, version)
-
             if unique_key not in unique_components:
                 unique_components.add(unique_key)
                 data_list.append({
@@ -92,35 +95,23 @@ def extract_components_data(data):
                     "ecosystem": ecosystem,
                     "version": version,
                     "scope": scope,
-                    "licenses": licenses,
-                    "license_urls": license_urls,
+                    "licenses": licenses if licenses else [{"license_name": "N/A", "license_url": "N/A"}],
                     "hashes": hashes,
                     "external_references": external_references,
-                    "type": type_,
+                    "type": component.get('type', 'N/A'),
                     "purl": purl,
-                    "bomref": bom_ref,
+                    "bomref": component.get('bom-ref', 'N/A'),
                     "vulnerabilities": component_vulnerabilities,
-                    "dependencies": dependencies_str,
+                    "dependencies": dependencies_str
                 })
                 unique_id_counter += 1
 
     return data_list
 
 def save_to_json(data_list, json_file_path):
-    data_list.sort(key=lambda x: (
-        len(x["vulnerabilities"]) == 0,
-        min([vuln["severity"] for vuln in x["vulnerabilities"]], default='unknown'),
-        x["group"].lower(),
-        x["name"].lower(),
-        x["version"].lower()
-    ))
-
-    summary = {
-        "components": data_list
-    }
-
+    wrapped_data = {"components": data_list}
     with open(json_file_path, "w", encoding="utf-8") as json_file:
-        json.dump(summary, json_file, ensure_ascii=False, indent=4)
+        json.dump(wrapped_data, json_file, ensure_ascii=False, indent=4)
 
 if __name__ == "__main__":
     repo_name = sys.argv[1]

@@ -14,12 +14,14 @@ with open(input_file_path, "r", encoding="utf-8") as file:
 
 summary = {
     "project": sbom_data.get("metadata", {}).get("component", {}).get("name", "알 수 없음"),
+    "version": sbom_data.get("metadata", {}).get("component", {}).get("version", "알 수 없음"),
+    "purl": sbom_data.get("metadata", {}).get("component", {}).get("purl", "알 수 없음"),
     "format": sbom_data.get("bomFormat", "알 수 없음"),
-    "version": sbom_data.get("specVersion", "알 수 없음"),
+    "sbomversion": sbom_data.get("specVersion", "알 수 없음"),
     "id": sbom_data.get("serialNumber", "알 수 없음"),
     "last_update": sbom_data.get("metadata", {}).get("timestamp", "알 수 없음"),
-    "tool": ["SCABLE"],
-    "author": ["SCABLE"],
+    "tool": [tool.get("name", "알 수 없음") for tool in sbom_data.get("metadata", {}).get("tools", {}).get("components", [])],
+    "author": [author.get("name", "알 수 없음") for author in sbom_data.get("metadata", {}).get("authors", [])],
     "license_sum": {
         "usedlicense": 0
     },
@@ -85,9 +87,7 @@ for vulnerability in sbom_data.get("vulnerabilities", []):
     else:
         summary["vuln_sum"]["unknown"] += 1
 
-summary["license_sum"]["usedlicense"] = len(summary["license_sum"]) - 1 
+summary["license_sum"]["usedlicense"] = len(summary["license_sum"]) - 1
 
 with open(output_file_path, "w", encoding="utf-8") as file:
     json.dump(summary, file, ensure_ascii=False, indent=4)
-
-print(f"Summary file has been created: {output_file_path}")

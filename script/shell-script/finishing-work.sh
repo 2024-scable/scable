@@ -1,5 +1,4 @@
 #!/bin/bash
-
 repo_url=$1
 repo_name=$2
 lan=$3
@@ -19,6 +18,7 @@ sqlite3 /home/scable/log/scable-log.db <<EOF
 UPDATE log SET end_time="$end_time" WHERE start_time="$start_time";
 EOF
 
+python3 /home/scable/script/etc/merge.py "$target_repo_path" "$start_time" "$repo_name" "$date" 
 mv "${target_repo_path}/reachable.json" "/home/scable/result-html/public/${date}_${start_time}_${repo_name}"
 mv "${target_repo_path}/packagecheck-summary.json" "/home/scable/result-html/public/${date}_${start_time}_${repo_name}"
 mv "${target_repo_path}/sbom-detail.json" "/home/scable/result-html/public/${date}_${start_time}_${repo_name}"
@@ -26,6 +26,7 @@ mv "${target_repo_path}/sbom-summary.json" "/home/scable/result-html/public/${da
 cp "${target_repo_path}/${date}-${start_time}-${repo_name}-scable-CycloneDX.json" "/home/scable/result-html/public/${date}_${start_time}_${repo_name}/sbom-cyclonedx.json"
 cp "${target_repo_path}/${date}-${start_time}-${repo_name}-scable-SPDX.json" "/home/scable/result-html/public/${date}_${start_time}_${repo_name}/sbom-spdx.json"
 cp "${target_repo_path}/${date}-${start_time}-${repo_name}-scable-swid.xml" "/home/scable/result-html/public/${date}_${start_time}_${repo_name}/sbom-swid.xml"
+mv "${target_repo_path}/dependency.json" "/home/scable/result-html/public/${date}_${start_time}_${repo_name}"
 
 cd "$target_repo_path" || exit 1
 zip -r "$repo_name-scable.zip" ./*

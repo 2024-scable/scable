@@ -1,3 +1,5 @@
+# config.py
+
 from datetime import timezone, timedelta
 import sqlite3
 import json
@@ -79,15 +81,19 @@ class Config:
             except Exception as e:
                 print(f"Error saving settings: {str(e)}")
 
-    @property
-    def settings(self):
-        return self.load_settings()
+    @staticmethod
+    def get_setting(key, default=None):
+        settings = Config.load_settings()
+        return settings.get(key, default)
 
-    def validate_settings(self):
-        if not self.settings.get("GITHUB_API_TOKEN"):
+    @staticmethod
+    def validate_settings():
+        settings = Config.load_settings()
+        if not settings.get("GITHUB_API_TOKEN"):
             raise ValueError(
                 "GitHub API Token is mandatory. Please provide 'GITHUB_API_TOKEN' in the settings file."
             )
+
 
 class Database:
     DATABASE_PATH = "scable-log.db"

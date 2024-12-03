@@ -1,31 +1,6 @@
-import json
 from flask import Blueprint, request, render_template, redirect, url_for
-import threading
-
+from config import Config
 settingsController = Blueprint("settingsController", __name__)
-
-settings_lock = threading.Lock()
-
-def load_settings():
-    with settings_lock:
-        try:
-            with open("settings.json", "r") as f:
-                settings = json.load(f)
-                print("Settings successfully loaded.")
-                return settings
-        except (FileNotFoundError, json.JSONDecodeError):
-            print("Settings file not found or invalid. Returning default settings.")
-            return {}
-
-def save_settings(settings):
-    with settings_lock:  
-        try:
-            print(f"Saving settings: {settings}")
-            with open("settings.json", "w") as f:
-                json.dump(settings, f, indent=4)
-            print("Settings have been successfully saved.")
-        except Exception as e:
-            print(f"Error saving settings: {str(e)}")
 
 def get_success_message(settings):
     configured_settings = []
@@ -65,7 +40,7 @@ def get_success_message(settings):
 @settingsController.route("/settings", methods=["GET"])
 def settings():
     success = request.args.get("success", None)
-    settings = load_settings()
+    settings = Config.load_settings()
     success_message = get_success_message(settings) if success else None
     return render_template("settings.html", settings=settings, success_message=success_message)
 
@@ -100,6 +75,6 @@ def update_all_settings():
 
     print(f"Final settings to save: {settings}")
 
-    save_settings(settings)
+    Config.save_settings(settings)
     print("All settings have been successfully saved.")
     return redirect(url_for("settingsController.settings", success=1))

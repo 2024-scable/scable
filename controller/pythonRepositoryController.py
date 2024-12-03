@@ -3,29 +3,40 @@ from config import Config
 from controller.relayHandler import relayRequest
 from engine.typosquattingCheck import TypoSquattingChecker
 from engine.reputationCheck import ReputationChecker
-import threading
+import sys
 
 pythonController = Blueprint("pythonController", __name__)
+typoChecker = TypoSquattingChecker("python")
 
-def getPackageName(path):
-    slicePath = path.strip("/").split("/")
-    return slicePath[-1].lower()
+@pythonController.route("/package-check/pypi/<path:path>", methods=Config.ALLOW_METHODS)
+def pypiProxy(path):
+    settings = Config.load_settings()
+    skip_packages = settings.get("SKIP_REPUTATION_PACKAGES", [])
+    block_reputation_threshold = settings.get("BLOCK_REPUTATION_THRESHOLD", [])
 
-def handle_reputation_check(libraryName, package_version, platform, config, relay_args):
-    typoChecker = TypoSquattingChecker(language="python")
-    try:
-        if libraryName in config.get("SKIP_REPUTATION_PACKAGES", []):
-            relayRequest(*relay_args)
-            return
+    resourceUrl = Config.PYPI_REPO_URL + path
+    reqHeader = dict(request.headers)
+    reqHeader["Host"] = "pypi.org"
 
-        if typoChecker.checkExactPackageName(libraryName):
-            relayRequest(*relay_args)
-            return
+    libraryName = getPackageName(path)
 
+    print("SKIP_REPUTATION_PACKAGES:", skip_packages)
+    print(f"Checking package: {libraryName}")
+
+    if libraryName in skip_packages:
+        print(f"[*] Skipping reputation check for package: {libraryName}")
+        return relayRequest(resourceUrl, path, request.method, reqHeader)
+
+    if typoChecker.checkExactPackageName(libraryName):
+        print("[*] Normal (Famous) Library")
+        return relayRequest(resourceUrl, path, request.method, reqHeader)
+
+    else:
+        print("[*] Non-Famous Library")
         is_typosquatting, highest_similarity, similar_packages = typoChecker.check_typo_squatting(libraryName)
         typosquatting_status = "Suspected" if is_typosquatting else "Not suspected"
 
-        reputation = ReputationChecker.check_package_reputation(libraryName, package_version, platform)
+        reputation = ReputationChecker.check_package_reputation(libraryName, platform="pypi")
         if reputation:
             reputation.update({
                 "typosquatting_status": typosquatting_status,
@@ -34,37 +45,13 @@ def handle_reputation_check(libraryName, package_version, platform, config, rela
                 "score": reputation.get("score", 0)
             })
 
-            if reputation["risk_level"].upper() in config.get("BLOCK_REPUTATION_THRESHOLD", []):
-                print(f"Blocking package '{libraryName}' due to reputation risk.")
-                return
+            print(reputation)
 
-        relayRequest(*relay_args)
-    except Exception as e:
-        print(f"Error in reputation check thread: {e}")
+            if reputation["risk_level"].upper() in block_reputation_threshold:
+                return jsonify(reputation), 400
 
-@pythonController.route("/package-check/pypi/<path:path>", methods=Config.ALLOW_METHODS)
-def pypiProxy(path):
-    resourceUrl = Config.PYPI_REPO_URL + path
-    reqHeader = dict(request.headers)
-    reqHeader["Host"] = "pypi.org"
+        return relayRequest(resourceUrl, path, request.method, reqHeader)
 
-    try:
-        config = Config().settings
-
-        libraryName = getPackageName(path)
-
-        package_version = request.args.get("package_version", "")
-        platform = "pypi"  
-
-        relay_args = (resourceUrl, path, request.method, reqHeader)
-
-        reputation_thread = threading.Thread(
-            target=handle_reputation_check,
-            args=(libraryName, package_version, platform, config, relay_args)
-        )
-        reputation_thread.start()
-
-        return jsonify({"message": "Request is being processed."}), 202  
-
-    except Exception as e:
-        return jsonify({"error": "Internal Server Error", "message": str(e)}), 500
+def getPackageName(path):
+    slicePath = path.strip("/").split("/")
+    return slicePath[-1].lower()
