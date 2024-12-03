@@ -1,0 +1,44 @@
+{
+  "title": "SCABLE API Documentation",
+  "description": "Key APIs for SBOM generation and package reputation check.",
+  "endpoints": [
+    {
+      "description": "Generate SBOM and trace Reachable Components.",
+      "endpoint": "/sbom",
+      "example_request": "curl \"http://scable.kr:8282/sbom?repo_url={repo-url}&lan=python\"",
+      "http_method": "GET",
+      "parameters": [
+        {
+          "description": "The URL of the repository to analyze.",
+          "name": "repo_url",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "description": "The language of the repository (fixed value: 'python').",
+          "name": "lan",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "description": "Check the reputation of a PyPI package.",
+      "endpoint": "/package-check",
+      "example_request": "curl \"http://scable.kr:8282/package-check?package_name={package-name}\"",
+      "http_method": "GET",
+      "parameters": [
+        {
+          "description": "The name of the PyPI package to check.",
+          "name": "package_name",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "description": "Configure settings such as GitHub integration, reputation thresholds, and packages to skip for reputation checks.",
+      "endpoint": "/settings"
+    }
+  ]
+}
