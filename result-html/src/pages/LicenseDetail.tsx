@@ -405,7 +405,7 @@ const LicenseDetail: React.FC = () => {
                                     .slice(0, visibleCount)
                                     .map((pkg) => (
                                         <div key={pkg.unique_id} className="text-gray-700">
-                                            <Link to={`/${projectName}/package/${pkg.unique_id}`} className="text-blue-500 hover:underline">
+                                            <Link to={`/${projectName}/components/${pkg.unique_id}`} className="text-blue-500 hover:underline">
                                                 {pkg.group ? `${pkg.group}/` : ''}{pkg.name}@{pkg.version}
                                             </Link>
                                         </div>
