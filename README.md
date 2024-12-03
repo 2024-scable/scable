@@ -13,7 +13,7 @@ SCABLE is an open-source solution that systematically and automatically analyzes
 
 <!--프로젝트 대문 이미지-->
 <div align="center">
-    <img src="https://github.com/2024-scable/scable/blob/main/img/scable_mainpage.jpg" alt="SCABLE Main Image" width="1000" />
+    <img src="https://github.com/2024-scable/scable/blob/main/img/scable_mainpage.png" alt="SCABLE Main Image" width="1000" />
 </div>
 
 <!--프로젝트 버튼-->
@@ -223,7 +223,8 @@ curl "http://scable.kr:8282/package-check?package_name=numppy"
 ## License Details
 ![SCABLE License Analysis](https://github.com/2024-scable/scable/blob/main/img/scable_license.jpg)
 
-
+## Dependency Tree
+![SCABLE Dependency Tree](https://github.com/2024-scable/scable/blob/main/img/scable_dependencytree.png)
 
 # [5] SCABLE's VISION
 ### "SCABLE ensures the reliability and security of software supply chains, empowering organizations to manage supply chain security efficiently and systematically."
