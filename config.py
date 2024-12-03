@@ -1,5 +1,3 @@
-# config.py
-
 from datetime import timezone, timedelta
 import sqlite3
 import json
@@ -19,9 +17,6 @@ class Config:
         "SLACK_TOKEN": "",
         "USER_TAG": "",
         "SLACK_CHANNEL_ID": "",
-        "JENKINS_URL": "",
-        "JENKINS_USER": "",
-        "JENKINS_API_TOKEN": "",
         "BLOCK_REPUTATION_THRESHOLD": ["RED"],
         "SKIP_REPUTATION_PACKAGES": []
     }
