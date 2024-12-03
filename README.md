@@ -19,7 +19,7 @@ SCABLE is an open-source solution that systematically and automatically analyzes
 <!--프로젝트 버튼-->
 <p align="center">
     <a href="https://docs.scable.kr/">More About SCABLE</a> • 
-    <a href="https://dev-ujin.github.io">View Demo</a> • 
+    <a href="https://www.youtube.com/@scable-p7f">View Demo</a> • 
     <a href="https://github.com/2024-scable/scable/issues">Download Brochure</a> • 
     <a href="https://github.com/2024-scable/scable/issues">Report Bug</a>
 </p>
