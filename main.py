@@ -1,6 +1,7 @@
 import os
 import subprocess
-from flask import Flask
+import json
+from flask import Flask, render_template, jsonify, Response
 from config import Config, teardown_session, start_npm_dev
 from controller.javaRepositoryController import javaController
 from controller.pythonRepositoryController import pythonController
@@ -18,9 +19,15 @@ app.register_blueprint(SCAController)
 app.register_blueprint(jenkinsController)
 
 @app.route("/", methods=Config.ALLOW_METHODS)
-@app.route("/healthy")
+def apidocs():
+    return render_template("api-docs.html")
+
+@app.route("/healthy", methods=["GET"])
 def healthy():
-    return "ok"
+    file_path = os.path.join(os.path.dirname(__file__), "data", "api-docs.json")
+    with open(file_path, "r") as json_file:
+        json_data = json_file.read()
+    return Response(json_data, content_type="application/json")
 
 @app.teardown_appcontext
 def teardown(exception=None):
