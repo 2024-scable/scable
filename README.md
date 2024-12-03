@@ -139,12 +139,18 @@ curl "http://127.0.0.1:8282/sbom?repo_url=https://github.com/example/python-exam
 
 ### Example Response
 ```
+[*] SCABLE ANALYZE START
+[+] CREATE SBOM COMPLETE
+[+] REACHABLE ANALYZE COMPLETE
+[+] PACKAGE ANALYZE COMPLETE
+[+] FINISHING WORK COMPLETE
+
 {
-  "date": "2024-12-02",
-  "start_time": "16-14-28",
+  "date": "2024-12-03",
+  "start_time": "20-24-26",
   "repository": "python-example",
   "language": "python",
-  "reporting_url": "http://localhost:5173/2024-12-02_16-14-28_python-example"
+  "reporting_url": "http://localhost:5173/2024-12-03_20-24-26_python-example"
 }
 ```
 ## 2. /package-check
