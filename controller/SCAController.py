@@ -1,11 +1,12 @@
 from config import Config, Database
-from flask import Blueprint, request, jsonify, Response
+from flask import Blueprint, request, jsonify, Response, stream_with_context
 from datetime import datetime
 from engine.typosquattingCheck import TypoSquattingChecker
 from engine.reputationCheck import ReputationChecker
-import os, re
+import os
 import threading
 import json
+import subprocess
 
 SCAController = Blueprint("SCAController", __name__)
 
@@ -28,19 +29,74 @@ def get_platform_to_language(platform):
     else:
         return None
 
-def execute_sbom(repo_url, repo_name, lan, target_repo_path, start_time, current_date, status_event):
+def generate_sbom_output(repo_url, repo_name, lan, target_repo_path, start_time, current_date):
     try:
-        command = f'{Config.SBOM_MAIN_SHELL_SCRIPT_PATH} {repo_url} {repo_name} {lan} {target_repo_path} {start_time} {current_date}'
-        os.system(command)
+        script_path = "/home/scable/script/shell-script/main.sh"  
+        command = [
+            "stdbuf", "-oL",  
+            "/bin/bash",
+            script_path,
+            repo_url,
+            repo_name,
+            lan,
+            target_repo_path,
+            start_time,
+            current_date
+        ]
+        
+        process = subprocess.Popen(
+            command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            bufsize=1
+        )
 
-        reporting_url = f"http://localhost:5173/{current_date}_{start_time}_{repo_name}"
-        Database.update_sbom_result(current_date, start_time, repo_name, "completed", reporting_url)
+        for line in iter(process.stdout.readline, ''):
+            if line:
+                yield line
+            else:
+                break
+        process.stdout.close()
+        process.wait()
+
+        if process.returncode == 0:
+            reporting_url = f"http://localhost:5173/{current_date}_{start_time}_{repo_name}"
+            Database.update_sbom_result(current_date, start_time, repo_name, "completed", reporting_url)
+        else:
+            Database.update_sbom_result(current_date, start_time, repo_name, "failed", None)
+            yield json.dumps({"error": "SBOM generation failed"}, ensure_ascii=False, indent=2) + '\n'
+            return
+
+        conn = Database.get_database_connect()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT status, result_url FROM log
+            WHERE date = ? AND start_time = ? AND repo_name = ?
+        """, (current_date, start_time, repo_name))
+        result = cursor.fetchone()
+        conn.close()
+
+        if result:
+            status, result_url = result
+            if status == "completed":
+                response_data = {
+                    "date": current_date,
+                    "start_time": start_time,
+                    "repository": repo_name,
+                    "language": lan,
+                    "reporting_url": result_url
+                }
+                yield json.dumps(response_data, ensure_ascii=False, indent=2) + '\n\n'
+            else:
+                yield json.dumps({"error": "SBOM generation failed"}, ensure_ascii=False, indent=2) + '\n\n'
+        else:
+            yield json.dumps({"error": "SBOM result not found"}, ensure_ascii=False, indent=2) + '\n\n'
 
     except Exception as e:
-        print(f"Error executing SBOM script: {e}")
-        Database.update_sbom_result(current_date, start_time, repo_name, "failed", None)
-    finally:
-        status_event.set()
+        print(f"Error in generate_sbom_output: {e}")
+        yield json.dumps({"error": "Internal server error", "details": str(e)}, ensure_ascii=False, indent=2) + '\n\n'
+        yield '\n\n'
 
 @SCAController.route("/sbom")
 def sbom():
@@ -76,44 +132,14 @@ def sbom():
             status="in_progress"
         )
 
-        status_event = threading.Event()
+        def generate():
+            yield from generate_sbom_output(repo_url, repo_name, lan, target_repo_path, start_time, current_date)
 
-        sbom_thread = threading.Thread(
-            target=execute_sbom,
-            args=(repo_url, repo_name, lan, target_repo_path, start_time, current_date, status_event)
+        return Response(
+            stream_with_context(generate()),
+            mimetype='text/plain',
+            headers={'Content-Type': 'text/plain; charset=utf-8'}
         )
-        sbom_thread.start()
-
-        status_event.wait()
-
-        conn = Database.get_database_connect()
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT status, result_url FROM log
-            WHERE date = ? AND start_time = ? AND repo_name = ?
-        """, (current_date, start_time, repo_name))
-        result = cursor.fetchone()
-        conn.close()
-
-        if result:
-            status, result_url = result
-            if status == "completed":
-                response_data = {
-                    "date": current_date,
-                    "start_time": start_time,
-                    "repository": repo_name,
-                    "language": lan,
-                    "reporting_url": result_url
-                }
-                return Response(
-                    json.dumps(response_data, ensure_ascii=False, indent=2),
-                    status=200,
-                    mimetype='application/json'
-                )
-            else:
-                return jsonify({"error": "SBOM generation failed"}), 500
-        else:
-            return jsonify({"error": "SBOM result not found"}), 500
 
     except Exception as e:
         print(f"Unexpected error in /sbom route: {e}")
@@ -127,7 +153,7 @@ def check_reputation():
 
     language = get_platform_to_language(platform)
     if language is None:
-        return f"Not Found Platform to Language: {platform}", 400
+        return jsonify({"error": f"Not Found Platform to Language: {platform}"}), 400
 
     typoChecker = TypoSquattingChecker(language=language)
 
@@ -138,7 +164,7 @@ def check_reputation():
     if package_name_lower in typoChecker.packageList:
         return jsonify({
             "package_name": package_name,
-            "message": "Matches TOP 8000 PyPI packages",
+            "message": "Matches TOP 8000 packages",
             "risk_level": "Green",
             "score": 0
         }), 200
