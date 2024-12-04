@@ -132,11 +132,15 @@ GET http://127.0.0.1:8282/sbom
 | `repo_url`   | string  | Yes      | Git Repository URL or absolute path of the project to be analyzed|
 | `lan`        | string  | Yes      | Fixed value: `python`           |
 
-### Example Request 1
+### Example Request 1(Public Git URL Test)
 ```
 curl "http://127.0.0.1:8282/sbom?repo_url=https://github.com/example/python-example&lan=python"
 ```
-### Example Request 2
+### Example Request 2(Private Git URL Test)
+```
+curl "http://127.0.0.1:8282/sbom?repo_url=https://<USERNAME>:<TOKEN>@github.com/<OWNER>/<REPO>&lan=python"
+```
+### Example Request 3(Absolute path of the project Test )
 ```
 curl "http://127.0.0.1:8282/sbom?repo_url=/home/test/python-example&lan=python"
 ```
