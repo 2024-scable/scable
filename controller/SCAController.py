@@ -7,6 +7,7 @@ import os
 import threading
 import json
 import subprocess
+import urllib.parse
 
 SCAController = Blueprint("SCAController", __name__)
 
@@ -29,21 +30,28 @@ def get_platform_to_language(platform):
     else:
         return None
 
-def generate_sbom_output(repo_url, repo_name, lan, target_repo_path, start_time, current_date):
+def is_url(path):
     try:
-        script_path = "/home/scable/script/shell-script/main.sh"  
+        result = urllib.parse.urlparse(path)
+        return all([result.scheme, result.netloc])
+    except ValueError:
+        return False
+
+def generate_sbom_output(source_path, repo_name, lan, target_repo_path, start_time, current_date):
+    try:
+        script_path = "/home/scable/script/shell-script/main.sh"
         command = [
-            "stdbuf", "-oL",  
+            "stdbuf", "-oL",
             "/bin/bash",
             script_path,
-            repo_url,
+            source_path,
             repo_name,
             lan,
             target_repo_path,
             start_time,
             current_date
         ]
-        
+
         process = subprocess.Popen(
             command,
             stdout=subprocess.PIPE,
@@ -100,20 +108,17 @@ def generate_sbom_output(repo_url, repo_name, lan, target_repo_path, start_time,
 
 @SCAController.route("/sbom")
 def sbom():
-    repo_url = request.args.get('repo_url')
+    source_path = request.args.get('repo_url')
     lan = request.args.get('lan')
-    if not repo_url or not lan:
+    if not source_path or not lan:
         return jsonify({"error": "Missing required parameters: repo_url and lan"}), 400
-
-    if not (repo_url.startswith("https://") or repo_url.startswith("http://")):
-        return jsonify({"error": "Invalid repo_url scheme"}), 400
 
     try:
         now = datetime.now(Config.SEOUL_TIME_ZONE)
         current_date = now.strftime("%Y-%m-%d")
         start_time = now.strftime("%H-%M-%S")
 
-        repo_name = repo_url.rstrip('/').split("/")[-1]
+        repo_name = os.path.basename(source_path.rstrip('/'))
         target_repo_path = f"{Config.TARGET_REPO_HOME_PATH}/{current_date}_{start_time}_{repo_name}"
         os.makedirs(target_repo_path, exist_ok=True)
 
@@ -133,7 +138,7 @@ def sbom():
         )
 
         def generate():
-            yield from generate_sbom_output(repo_url, repo_name, lan, target_repo_path, start_time, current_date)
+            yield from generate_sbom_output(source_path, repo_name, lan, target_repo_path, start_time, current_date)
 
         return Response(
             stream_with_context(generate()),
