@@ -129,12 +129,16 @@ GET http://127.0.0.1:8282/sbom
 ### Request Patameters
 | Parameter    | Type    | Required | Description                     |
 |--------------|---------|----------|---------------------------------|
-| `repo_url`   | string  | Yes      | URL of the repository to analyze |
+| `repo_url`   | string  | Yes      | Git Repository URL or absolute path of the project to be analyzed|
 | `lan`        | string  | Yes      | Fixed value: `python`           |
 
-### Example Request
+### Example Request 1
 ```
 curl "http://127.0.0.1:8282/sbom?repo_url=https://github.com/example/python-example&lan=python"
+```
+### Example Request 2
+```
+curl "http://127.0.0.1:8282/sbom?repo_url=/home/test/python-example&lan=python"
 ```
 
 ### Example Response
