@@ -13,14 +13,12 @@ def is_url(path):
 
 def generate_sbom(source_path, repo_name, target_repo_path):
     try:
-        # target_repo_path가 존재하지 않으면 생성합니다.
         if not os.path.exists(target_repo_path):
             os.makedirs(target_repo_path)
 
         repo_clone_path = os.path.join(target_repo_path, f"{repo_name}-repo")
 
         if is_url(source_path):
-            # GitHub URL인 경우
             if os.path.exists(repo_clone_path):
                 print(f"Directory {repo_clone_path} already exists. Deleting and recloning.")
                 shutil.rmtree(repo_clone_path)
@@ -28,7 +26,6 @@ def generate_sbom(source_path, repo_name, target_repo_path):
             subprocess.run(["git", "clone", source_path, repo_clone_path], check=True)
             analysis_path = repo_clone_path
         else:
-            # 로컬 디렉토리인 경우
             source_path = os.path.abspath(source_path)
             if not os.path.exists(source_path):
                 print(f"[ERROR] The local directory {source_path} does not exist.")
@@ -44,7 +41,6 @@ def generate_sbom(source_path, repo_name, target_repo_path):
         sbom_file = f"{repo_name}-CycloneDX.json"
         sbom_output_path = os.path.join(target_repo_path, sbom_file)
 
-        # SBOM 파일을 직접 target_repo_path에 생성하도록 경로를 지정합니다.
         cdxgen_command = f"cd '{analysis_path}' && cdxgen -r . -o '{sbom_output_path}'"
         print(f"Running command: {cdxgen_command}")
 
