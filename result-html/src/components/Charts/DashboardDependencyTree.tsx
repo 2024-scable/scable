@@ -17,7 +17,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import coseBilkent from 'cytoscape-cose-bilkent';
 cytoscape.use(coseBilkent);
 
-// 타입 정의
 interface Vulnerability {
   cve_id: string;
   severity: string;
@@ -50,7 +49,7 @@ interface DependencyTreeViewProps {
   tree: DependencyTree;
   packageToIdMap: Map<string, number | null>;
   searchTerm: string;
-  depth: number; // 뎁스 표시를 위한 prop
+  depth: number;
 }
 
 interface SelectedNodeData {
@@ -59,10 +58,9 @@ interface SelectedNodeData {
   version?: string;
   vulnerabilities: Vulnerability[];
   dependencyTree: DependencyTree | null;
-  unique_id: number | null; // unique_id 추가
+  unique_id: number | null; 
 }
 
-// 패키지 이름 추출 함수
 const extract_name_from_ref = (ref: string): string => {
   const decoded_ref = decodeURIComponent(ref);
   const pattern = /^pkg:[^/]+\/(?:@([^/]+)\/)?([^@]+)@.+$/;
@@ -84,7 +82,6 @@ const extract_name_from_ref = (ref: string): string => {
   }
 };
 
-// Utility 함수: purl 파싱
 const parsePurl = (purl: string) => {
   const decoded_purl = decodeURIComponent(purl);
   const pattern = /^pkg:[^/]+\/(?:@([^/]+)\/)?([^@]+)@([^?]+)(?:\?.+)?(?:#.+)?$/;
@@ -103,22 +100,21 @@ const parsePurl = (purl: string) => {
   return { namespace, name, version };
 };
 
-// 스타일 정의 (인라인 스타일 객체)
 const inlineStyles = {
   sidebar: {
     padding: '10px',
     overflowY: 'auto' as const,
     backgroundColor: '#ecf0f1',
-    fontSize: '0.85rem', // 폰트 크기 줄임
+    fontSize: '0.85rem', 
     height: '100%',
   },
   card: {
     backgroundColor: '#ffffff',
-    padding: '8px', // 패딩 줄임
+    padding: '8px',
     borderRadius: '6px',
     boxShadow: '0 1px 4px rgba(0, 0, 0, 0.1)',
-    marginBottom: '8px', // 마진 줄임
-    flex: '0 0 auto', // 내용에 따라 높이 조정
+    marginBottom: '8px',
+    flex: '0 0 auto',
   },
   cardHeader: {
     display: 'flex',
@@ -128,10 +124,10 @@ const inlineStyles = {
   cardHeaderIcon: {
     marginRight: '6px',
     color: '#3498db',
-    fontSize: '0.9rem', // 폰트 크기 줄임
+    fontSize: '0.9rem', 
   },
   cardTitle: {
-    fontSize: '0.9rem', // 폰트 크기 줄임
+    fontSize: '0.9rem', 
     fontWeight: 600,
     color: '#2c3e50',
   },
@@ -140,7 +136,7 @@ const inlineStyles = {
   },
   packageDetailStrong: {
     color: '#34495e',
-    fontSize: '0.85rem', // 폰트 크기 줄임
+    fontSize: '0.85rem',
   },
   vulnerabilityList: {
     listStyle: 'none',
@@ -150,13 +146,13 @@ const inlineStyles = {
   vulnerabilityItem: {
     display: 'flex',
     alignItems: 'center',
-    padding: '4px 0', // 패딩 줄임
+    padding: '4px 0', 
     borderBottom: '1px solid #bdc3c7',
   },
   vulnerabilityIcon: {
     marginRight: '6px',
     color: '#e74c3c',
-    fontSize: '0.8rem', // 폰트 크기 줄임
+    fontSize: '0.8rem', 
   },
   vulnerabilityButton: {
     background: 'none',
@@ -164,7 +160,7 @@ const inlineStyles = {
     color: '#2980b9',
     cursor: 'pointer',
     textDecoration: 'underline',
-    fontSize: '0.75rem', // 폰트 크기 줄임
+    fontSize: '0.75rem',
     padding: 0,
   },
   vulnerabilityButtonHover: {
@@ -178,12 +174,12 @@ const inlineStyles = {
   dependencyTreeHeaderIcon: {
     marginRight: '6px',
     color: '#27ae60',
-    fontSize: '0.9rem', // 폰트 크기 줄임
+    fontSize: '0.9rem', 
   },
   dependencyTreePlaceholder: {
     color: '#7f8c8d',
     fontStyle: 'italic' as const,
-    fontSize: '0.75rem', // 폰트 크기 줄임
+    fontSize: '0.75rem', 
   },
   controlLabel: {
     display: 'flex',
@@ -191,7 +187,7 @@ const inlineStyles = {
     marginRight: '15px',
     color: '#ecf0f1',
     fontWeight: 500,
-    fontSize: '0.85rem', // 폰트 크기 줄임
+    fontSize: '0.85rem', 
   },
   controlSlider: {
     marginLeft: '8px',
@@ -210,7 +206,6 @@ const inlineStyles = {
   },
 };
 
-// 재사용 가능한 Card 컴포넌트
 const Card: React.FC<{ title: string; icon: JSX.Element }> = ({ title, icon, children }) => (
   <div style={inlineStyles.card}>
     <div style={inlineStyles.cardHeader}>
@@ -221,7 +216,6 @@ const Card: React.FC<{ title: string; icon: JSX.Element }> = ({ title, icon, chi
   </div>
 );
 
-// Vulnerability List Item 컴포넌트
 const VulnerabilityItem: React.FC<{ vul: Vulnerability; onClick: () => void }> = ({ vul, onClick }) => {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -248,16 +242,13 @@ const VulnerabilityItem: React.FC<{ vul: Vulnerability; onClick: () => void }> =
   );
 };
 
-// DependencyTreeView 컴포넌트
 const DependencyTreeView: React.FC<DependencyTreeViewProps> = ({ tree, packageToIdMap, searchTerm, depth }) => {
   const [isOpen, setIsOpen] = useState<boolean>(true);
   const navigate = useNavigate();
   const { projectName } = useParams<{ projectName: string }>();
 
-  // unique_id 가져오기
   const uniqueId = packageToIdMap.get(tree.id);
 
-  // 검색어가 노드 라벨에 포함되는지 확인
   const isMatch = tree.label.toLowerCase().includes(searchTerm.toLowerCase());
 
   const handleNavigate = () => {
@@ -294,7 +285,7 @@ const DependencyTreeView: React.FC<DependencyTreeViewProps> = ({ tree, packageTo
             color: isMatch ? '#3498db' : '#2980b9',
             textDecoration: isMatch ? 'underline' : 'none',
             fontWeight: isMatch ? 'bold' : 'normal',
-            fontSize: '0.75rem', // 폰트 크기 줄임
+            fontSize: '0.75rem',
           }}
           onClick={handleNavigate}
           aria-label={`Package ${tree.label}`}
@@ -319,7 +310,6 @@ const DependencyTreeView: React.FC<DependencyTreeViewProps> = ({ tree, packageTo
   );
 };
 
-// DashboardDependencyTree 컴포넌트
 const DashboardDependencyTree: React.FC = () => {
   const [elements, setElements] = useState<ElementDefinition[]>([]);
   const [selectedNodeData, setSelectedNodeData] = useState<SelectedNodeData | null>(null);
@@ -331,10 +321,8 @@ const DashboardDependencyTree: React.FC = () => {
   const { projectName } = useParams<{ projectName: string }>();
   const navigate = useNavigate();
 
-  // dependency.json 데이터를 저장할 상태
   const [dependencyData, setDependencyData] = useState<Dependency[] | null>(null);
 
-  // 패키지 purl과 unique_id 매핑
   const packageToIdMap = useMemo(() => {
     const map = new Map<string, number | null>();
     if (dependencyData) {
@@ -345,44 +333,39 @@ const DashboardDependencyTree: React.FC = () => {
     return map;
   }, [dependencyData]);
 
-  // 데이터 포맷팅 함수 (중복 제거 및 전체 purl 사용)
   const formatData = useCallback((dependencies: Dependency[]): ElementDefinition[] => {
     const nodesMap = new Map<string, Dependency>();
     const edges: ElementDefinition[] = [];
 
     dependencies.forEach((dep) => {
-      nodesMap.set(dep.ref, dep); // 중복된 ref는 덮어쓰기
+      nodesMap.set(dep.ref, dep);
     });
 
     const nodes: ElementDefinition[] = [];
 
     nodesMap.forEach((dep, ref) => {
-      // 클래스 할당
       let nodeClass = '';
       if (dep.color === 'Red') {
         nodeClass = 'reachable';
       } else if (dep.color === 'Orange') {
         nodeClass = 'cve';
       } else {
-        nodeClass = ''; // Gray는 기본 스타일을 사용
+        nodeClass = '';
       }
 
-      // 패키지 이름 추출 (전체 purl 사용)
-      const purl = ref; // 전체 purl 사용
+      const purl = ref; 
 
-      // 노드 데이터 생성
       nodes.push({
         data: {
           id: ref,
-          label: purl, // 전체 purl을 라벨로 설정
+          label: purl, 
           version: parsePurl(ref).version,
           vulnerabilities: dep.cve,
-          dependencyTree: null, // 추후 업데이트
+          dependencyTree: null, 
         },
         classes: nodeClass,
       });
 
-      // 엣지 데이터 생성
       dep.dependsOn.forEach((child_ref) => {
         if (!nodesMap.has(child_ref)) {
           console.warn(`Target node does not exist: ${child_ref}. Edge will not be added.`);
@@ -400,7 +383,6 @@ const DashboardDependencyTree: React.FC = () => {
     return [...nodes, ...edges];
   }, []);
 
-  // dependency.json 로드 함수
   const loadDependencyData = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -412,7 +394,6 @@ const DashboardDependencyTree: React.FC = () => {
       const data: DependencyJSON = await response.json();
       console.log('Loaded dependency.json:', data);
 
-      // 데이터 유효성 검증 및 기본 값 할당
       const validatedData = data.dependencies.map((dep) => ({
         ...dep,
         color: dep.color || 'Gray',
@@ -428,13 +409,12 @@ const DashboardDependencyTree: React.FC = () => {
     } catch (error) {
       console.error('Error loading dependency.json:', error);
       alert(`An error occurred while loading dependency.json: ${(error as Error).message}`);
-      setDependencyData(null); // 로드 실패 시 null로 설정
+      setDependencyData(null);
     } finally {
       setIsLoading(false);
     }
   }, [formatData, projectName]);
 
-  // 컴포넌트 마운트 시 데이터 로드
   useEffect(() => {
     const initialize = async () => {
       setIsLoading(true);
@@ -451,7 +431,6 @@ const DashboardDependencyTree: React.FC = () => {
     initialize();
   }, [loadDependencyData]);
 
-  // 레이아웃 옵션 계산 함수
   const calculateLayoutOptions = useCallback(
     (numNodes: number) => ({
       name: 'cose-bilkent',
@@ -469,7 +448,6 @@ const DashboardDependencyTree: React.FC = () => {
     [nodeSpacing]
   );
 
-  // 종속성 트리 구축 함수
   const buildDependencyTree = useCallback(
     (
       currentNode: cytoscape.NodeSingular,
@@ -501,7 +479,6 @@ const DashboardDependencyTree: React.FC = () => {
     []
   );
 
-  // 노드 클릭 핸들러
   const handleNodeClick = useCallback(
     (node: cytoscape.NodeSingular) => {
       const uniqueId = packageToIdMap.get(node.id()) || null;
@@ -518,11 +495,9 @@ const DashboardDependencyTree: React.FC = () => {
 
       if (cyRef.current) {
         cyRef.current.batch(() => {
-          // 모든 노드의 'highlighted' 클래스 제거
           cyRef.current?.nodes().removeClass('highlighted');
           cyRef.current?.edges().removeClass('highlightedEdge');
 
-          // 선택된 노드에 'highlighted' 클래스 추가
           node.addClass('highlighted');
 
           const connectedNodes = cyRef.current?.collection();
@@ -555,7 +530,7 @@ const DashboardDependencyTree: React.FC = () => {
           traverseUpstream(node);
           traverseDownstream(node);
 
-          // 연결된 노드와 엣지에 'highlighted' 클래스 추가
+
           connectedNodes?.addClass('highlighted');
           connectedEdges?.addClass('highlightedEdge');
         });
@@ -564,7 +539,6 @@ const DashboardDependencyTree: React.FC = () => {
     [buildDependencyTree, packageToIdMap]
   );
 
-  // 검색 핸들러 최적화 (디바운스 적용)
   const handleSearch = useMemo(
     () =>
       debounce((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -575,19 +549,17 @@ const DashboardDependencyTree: React.FC = () => {
 
   useEffect(() => {
     return () => {
-      handleSearch.cancel(); // 컴포넌트 언마운트 시 디바운스 취소
+      handleSearch.cancel();
     };
   }, [handleSearch]);
 
-  // 필터 적용: 모든 Dependency 표시, 검색어에 맞는 노드만 표시
   useEffect(() => {
     if (cyRef.current) {
       cyRef.current.batch(() => {
-        // 모든 노드와 엣지를 표시
         cyRef.current?.nodes().show();
         cyRef.current?.edges().show();
 
-        // 검색어 필터링
+    
         if (searchTerm) {
           cyRef.current.nodes().forEach((node) => {
             if (!node.data('label').toLowerCase().includes(searchTerm.toLowerCase())) {
@@ -596,7 +568,6 @@ const DashboardDependencyTree: React.FC = () => {
           });
         }
 
-        // 연결된 엣지만 표시
         cyRef.current.edges().forEach((edge) => {
           if (edge.source().hidden() || edge.target().hidden()) {
             edge.hide();
@@ -610,7 +581,7 @@ const DashboardDependencyTree: React.FC = () => {
 
         try {
           cyRef.current.layout(layoutOptions).run();
-          cyRef.current.fit(); // 그래프를 화면에 맞춤
+          cyRef.current.fit(); 
         } catch (layoutError) {
           console.error('Error during layout:', layoutError);
         }
@@ -618,7 +589,6 @@ const DashboardDependencyTree: React.FC = () => {
     }
   }, [searchTerm, calculateLayoutOptions]);
 
-  // 취약점 클릭 핸들러 (리다이렉션)
   const handleCveClick = useCallback(
     (vul: Vulnerability) => {
       if (selectedNodeData && selectedNodeData.unique_id !== null) {
@@ -633,10 +603,8 @@ const DashboardDependencyTree: React.FC = () => {
     [navigate, projectName, selectedNodeData]
   );
 
-  // 레이아웃 옵션 메모이제이션
   const layoutOptions = useMemo(() => calculateLayoutOptions(elements.length), [elements.length, nodeSpacing]);
 
-  // 노드 검색 결과 목록
   const searchResults = useMemo(() => {
     if (!searchTerm) return [];
     return elements
@@ -644,7 +612,6 @@ const DashboardDependencyTree: React.FC = () => {
       .map((el) => el.data.id);
   }, [searchTerm, elements]);
 
-  // 검색 결과에서 노드 선택 핸들러
   const handleSelectSearchResult = (nodeId: string) => {
     const node = cyRef.current?.getElementById(nodeId);
     if (node && node.isNode()) {
@@ -669,7 +636,6 @@ const DashboardDependencyTree: React.FC = () => {
         height: '100vh',
       }}
     >
-      {/* 헤더 */}
       <div
         style={{
           padding: '10px 20px',
@@ -680,7 +646,6 @@ const DashboardDependencyTree: React.FC = () => {
           justifyContent: 'flex-start',
         }}
       >
-        {/* 검색 바 및 노드 간 거리 컨트롤 */}
         <div
           style={{
             position: 'relative',
@@ -691,7 +656,6 @@ const DashboardDependencyTree: React.FC = () => {
             marginRight: '20px',
           }}
         >
-          {/* 검색 바 */}
           <div style={{ display: 'flex', alignItems: 'center', flex: 1, marginRight: '20px' }}>
             <FaSearch style={{ marginRight: '10px' }} />
             <input
@@ -709,7 +673,6 @@ const DashboardDependencyTree: React.FC = () => {
               }}
             />
           </div>
-          {/* 노드 간 거리 컨트롤 */}
           <label style={inlineStyles.controlLabel}>
             노드 간 거리:
             <input
@@ -721,7 +684,6 @@ const DashboardDependencyTree: React.FC = () => {
               style={inlineStyles.controlSlider}
             />
           </label>
-          {/* 검색 결과 드롭다운 */}
           {searchTerm && searchResults.length > 0 && (
             <ul
               style={{
@@ -760,8 +722,6 @@ const DashboardDependencyTree: React.FC = () => {
           )}
         </div>
       </div>
-
-      {/* 메인 컨텐츠 */}
       <div style={{ flex: 1, display: 'flex' }}>
         <Split
           sizes={[20, 80]}
@@ -771,11 +731,9 @@ const DashboardDependencyTree: React.FC = () => {
           cursor="col-resize"
           style={{ display: 'flex', width: '100%', height: '100%' }}
         >
-          {/* 사이드바 */}
           <div style={inlineStyles.sidebar}>
             {selectedNodeData ? (
               <div>
-                {/* 패키지 상세 정보 카드 */}
                 <Card title="패키지 상세 정보" icon={<FaBoxOpen />}>
                   <div style={inlineStyles.packageDetail}>
                     <p>
@@ -785,7 +743,6 @@ const DashboardDependencyTree: React.FC = () => {
                   </div>
                 </Card>
 
-                {/* 취약점 목록 카드 */}
                 {selectedNodeData.vulnerabilities.length > 0 && (
                   <Card title="취약점 목록" icon={<FaExclamationTriangle />}>
                     <ul style={inlineStyles.vulnerabilityList}>
@@ -796,7 +753,6 @@ const DashboardDependencyTree: React.FC = () => {
                   </Card>
                 )}
 
-                {/* 종속성 트리 카드 */}
                 <Card title="종속성 트리" icon={<FaProjectDiagram />}>
                   {selectedNodeData.dependencyTree ? (
                     <DependencyTreeView
@@ -812,14 +768,13 @@ const DashboardDependencyTree: React.FC = () => {
               </div>
             ) : (
               <div style={inlineStyles.card}>
-                <p style={{ color: '#7f8c8d', fontStyle: 'italic', fontSize: '0.85rem' }}> {/* 폰트 크기 줄임 */}
+                <p style={{ color: '#7f8c8d', fontStyle: 'italic', fontSize: '0.85rem' }}> 
                   노드를 클릭하여 상세 정보를 확인하세요.
                 </p>
               </div>
             )}
           </div>
 
-          {/* 콘텐츠 영역 */}
           <div style={{ flex: 1, overflow: 'hidden', backgroundColor: '#fff', height: '100%' }}>
             {/* Cytoscape 그래프 */}
             <div style={{ width: '100%', height: '100%' }}>
