@@ -7,7 +7,7 @@ const DashboardLicense: React.FC = () => {
     const [licenseData, setLicenseData] = useState<any | null>(null);
     const [licenseRiskData, setLicenseRiskData] = useState<{ [key: string]: number | string }>({});
     const navigate = useNavigate();
-    const { projectName } = useParams(); // 현재 URL에서 프로젝트 이름 가져오기
+    const { projectName } = useParams();
 
 
     useEffect(() => {
@@ -81,7 +81,7 @@ const DashboardLicense: React.FC = () => {
 
     const handleLicenseClick = (licenseName: string) => {
         if (projectName) {
-            navigate(`/${projectName}/license/${licenseName}`); // 프로젝트 이름 포함 경로로 이동
+            navigate(`/${projectName}/license/${licenseName}`);
         } else {
             console.error('프로젝트 이름이 URL에 없습니다.');
         }
