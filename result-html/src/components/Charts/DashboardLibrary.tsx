@@ -10,9 +10,8 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
-import { FaSpinner } from "react-icons/fa"; // 로딩 스피너 아이콘 추가
+import { FaSpinner } from "react-icons/fa";
 
-// 타입 정의
 interface RiskLevelCounts {
   Red: number;
   Yellow: number;
@@ -26,7 +25,7 @@ interface ScoreGroup {
 
 interface DashboardData {
   RiskLevelCounts: RiskLevelCounts;
-  [ecosystem: string]: any; // 예: "npm_ScoreGroups"
+  [ecosystem: string]: any;
 }
 
 const DashboardLibrary: React.FC = () => {
@@ -34,9 +33,8 @@ const DashboardLibrary: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { projectName } = useParams(); // 현재 URL에서 프로젝트 이름 가져오기
+  const { projectName } = useParams();
 
-  // 데이터 페칭 함수
   const fetchData = async () => {
     try {
       const response = await fetch(`/${projectName}/packagecheck-summary.json`);
@@ -56,7 +54,6 @@ const DashboardLibrary: React.FC = () => {
     fetchData();
   }, []);
 
-  // 전체 위험도 및 에코시스템별 데이터 계산
   const totalRiskCounts: RiskLevelCounts = useMemo(() => {
     return data?.RiskLevelCounts || { Red: 0, Yellow: 0, Green: 0, "N/A": 0 };
   }, [data]);
@@ -65,7 +62,6 @@ const DashboardLibrary: React.FC = () => {
     return Object.values(totalRiskCounts).reduce((a, b) => a + b, 0);
   }, [totalRiskCounts]);
 
-  // 사용된 에코시스템 목록 동적으로 생성
   const ecosystems: string[] = useMemo(() => {
     if (!data) return [];
     return Object.keys(data)
@@ -73,7 +69,6 @@ const DashboardLibrary: React.FC = () => {
       .map((key) => key.replace("_ScoreGroups", ""));
   }, [data]);
 
-  // 에코시스템별 위험도 카운트 계산
   const getEcosystemRiskCounts = (ecosystem: string): RiskLevelCounts => {
     const scoreGroups: { [key: string]: ScoreGroup } = data?.[`${ecosystem}_ScoreGroups`];
     if (!scoreGroups) return { Red: 0, Yellow: 0, Green: 0, "N/A": 0 };
@@ -96,7 +91,6 @@ const DashboardLibrary: React.FC = () => {
     return counts;
   };
 
-  // 위험도 색상 매핑
   const getRiskColor = (riskLevel: string): string => {
     switch (riskLevel) {
       case "Red":
@@ -110,19 +104,17 @@ const DashboardLibrary: React.FC = () => {
     }
   };
 
-  // 차트 클릭 시 리다이렉트
   const handleChartClick = (ecosystem: string, riskLevel: string) => {
     if (projectName) {
         const url = `/${projectName}/components?ecosystem=${encodeURIComponent(
             ecosystem
         )}&risklevel=${encodeURIComponent(riskLevel.toLowerCase())}`;
-        navigate(url); // 프로젝트 이름 포함 URL로 이동
+        navigate(url);
     } else {
         console.error('프로젝트 이름이 URL에 정의되지 않았습니다.');
     }
   };
 
-  // 로딩 상태 표시
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-100 dark:bg-gray-800">
@@ -142,48 +134,45 @@ const DashboardLibrary: React.FC = () => {
 
   return (
     <div className="p-6 min-h-screen">
-      {/* 전체 요약 카드 */}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-6 mb-8">
-        {/* 전체 라이브러리 수 */}
         <SummaryCard
           title="Total Libraries"
           count={totalLibraries}
           bgColor="bg-blue-100 dark:bg-blue-800"
           textColor="text-blue-600 dark:text-blue-300"
-          fontSize="text-base" // 폰트 크기 조정
+          fontSize="text-base"
         />
-        {/* 위험도 별 카운트 */}
         <SummaryCard
           title="Warning (Red)"
           count={totalRiskCounts.Red}
           bgColor="bg-red-100 dark:bg-red-800"
           textColor="text-red-600 dark:text-red-300"
-          fontSize="text-base" // 폰트 크기 조정
+          fontSize="text-base"
         />
         <SummaryCard
           title="Caution (Yellow)"
           count={totalRiskCounts.Yellow}
           bgColor="bg-yellow-100 dark:bg-yellow-800"
           textColor="text-yellow-600 dark:text-yellow-300"
-          fontSize="text-base" // 폰트 크기 조정
+          fontSize="text-base"
         />
         <SummaryCard
           title="Safety (Green)"
           count={totalRiskCounts.Green}
           bgColor="bg-green-100 dark:bg-green-800"
           textColor="text-green-600 dark:text-green-300"
-          fontSize="text-base" // 폰트 크기 조정
+          fontSize="text-base"
         />
         <SummaryCard
           title="N/A"
           count={totalRiskCounts["N/A"]}
           bgColor="bg-gray-100 dark:bg-gray-800"
           textColor="text-gray-600 dark:text-gray-300"
-          fontSize="text-base" // 폰트 크기 조정
+          fontSize="text-base"
         />
       </div>
 
-      {/* 에코시스템별 위험도 통계 표 */}
       <div className="bg-white dark:bg-gray-800 rounded-lg p-6 overflow-x-auto mb-8">
         <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-4 text-center">
           Malicious Component Inspection Results
@@ -233,7 +222,6 @@ const DashboardLibrary: React.FC = () => {
         </table>
       </div>
 
-      {/* 에코시스템별 위험도 분포 차트 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {ecosystems.map((ecosystem, index) => {
           const counts = getEcosystemRiskCounts(ecosystem);
@@ -243,7 +231,6 @@ const DashboardLibrary: React.FC = () => {
             { name: "Green", value: counts.Green, color: "#2ECC71" },
           ];
 
-          // 위험도 값이 모두 0인 경우 차트를 표시하지 않음
           const totalRisk = counts.Red + counts.Yellow + counts.Green;
           if (totalRisk === 0) return null;
 
@@ -300,13 +287,12 @@ const DashboardLibrary: React.FC = () => {
   );
 };
 
-// 요약 카드 컴포넌트
 interface SummaryCardProps {
   title: string;
   count: number;
   bgColor: string;
   textColor: string;
-  fontSize: string; // 폰트 크기 추가
+  fontSize: string; 
 }
 
 const SummaryCard: React.FC<SummaryCardProps> = ({ title, count, bgColor, textColor, fontSize }) => {
