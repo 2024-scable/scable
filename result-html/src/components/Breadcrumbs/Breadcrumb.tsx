@@ -14,7 +14,6 @@ interface RouteParams {
 const Breadcrumb = ({ pageName }: BreadcrumbProps) => {
   const { projectName } = useParams<RouteParams>();
 
-  // projectName이 없을 경우 기본 루트('/')로 설정하거나 다른 처리를 할 수 있습니다.
   const dashboardPath = projectName ? `/${projectName}` : '/';
 
   return (
