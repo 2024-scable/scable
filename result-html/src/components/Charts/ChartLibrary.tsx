@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { FaSpinner } from "react-icons/fa"; // 로딩 스피너 아이콘 추가
+import { FaSpinner } from "react-icons/fa"; 
 
-// 타입 정의
+
 interface RiskLevelCounts {
   Red: number;
   Yellow: number;
@@ -18,7 +18,7 @@ interface ScoreGroup {
 
 interface DashboardData {
   RiskLevelCounts: RiskLevelCounts;
-  [ecosystem: string]: any; // 예: "npm_ScoreGroups"
+  [ecosystem: string]: any; 
 }
 
 const ChartLibrary: React.FC = () => {
@@ -26,9 +26,8 @@ const ChartLibrary: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { projectName } = useParams(); // 현재 URL에서 프로젝트 이름 가져오기
+  const { projectName } = useParams();
 
-  // 데이터 페칭 함수
   const fetchData = async () => {
     try {
       const response = await fetch(`/${projectName}/packagecheck-summary.json`);
@@ -48,7 +47,7 @@ const ChartLibrary: React.FC = () => {
     fetchData();
   }, []);
 
-  // 전체 위험도 및 에코시스템별 데이터 계산
+
   const totalRiskCounts: RiskLevelCounts = useMemo(() => {
     return data?.RiskLevelCounts || { Red: 0, Yellow: 0, Green: 0, "N/A": 0 };
   }, [data]);
@@ -57,7 +56,7 @@ const ChartLibrary: React.FC = () => {
     return Object.values(totalRiskCounts).reduce((a, b) => a + b, 0);
   }, [totalRiskCounts]);
 
-  // 사용된 에코시스템 목록 동적으로 생성
+ 
   const ecosystems: string[] = useMemo(() => {
     if (!data) return [];
     return Object.keys(data)
@@ -65,7 +64,7 @@ const ChartLibrary: React.FC = () => {
       .map((key) => key.replace("_ScoreGroups", ""));
   }, [data]);
 
-  // 에코시스템별 위험도 카운트 계산
+
   const getEcosystemRiskCounts = (ecosystem: string): RiskLevelCounts => {
     const scoreGroups: { [key: string]: ScoreGroup } = data?.[`${ecosystem}_ScoreGroups`];
     if (!scoreGroups) return { Red: 0, Yellow: 0, Green: 0, "N/A": 0 };
@@ -88,7 +87,6 @@ const ChartLibrary: React.FC = () => {
     return counts;
   };
 
-  // 위험도 색상 매핑
   const getRiskColor = (riskLevel: string): string => {
     switch (riskLevel) {
       case "Red":
@@ -102,7 +100,6 @@ const ChartLibrary: React.FC = () => {
     }
   };
 
-  // 차트 클릭 시 리다이렉트
   const handleChartClick = (ecosystem: string, riskLevel: string) => {
     const url = `/${projectName}/components?ecosystem=${encodeURIComponent(
       ecosystem
@@ -110,7 +107,6 @@ const ChartLibrary: React.FC = () => {
     navigate(url);
   };
 
-  // 로딩 상태 표시
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-100 dark:bg-gray-800">
@@ -119,7 +115,6 @@ const ChartLibrary: React.FC = () => {
     );
   }
 
-  // 에러 상태 표시
   if (error) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-100 dark:bg-gray-800">
@@ -134,16 +129,13 @@ const ChartLibrary: React.FC = () => {
         Malicious Component Inspection Results
       </h2>
       
-      {/* 전체 요약 카드 */}
       <div className="p-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-6 mb-4">
-        {/* 전체 라이브러리 수 */}
         <SummaryCard
           title="Total Libraries"
           count={totalLibraries}
           bgColor="bg-blue-50 dark:bg-blue-700"
           textColor="text-blue-600 dark:text-blue-300"
         />
-        {/* 위험도 별 카운트 */}
         <SummaryCard
           title="Warning (Red)"
           count={totalRiskCounts.Red}
@@ -170,7 +162,6 @@ const ChartLibrary: React.FC = () => {
         />
       </div>
 
-      {/* 에코시스템별 위험도 통계 표 */}
       <div className="bg-white dark:bg-gray-800 rounded-lg p-4 overflow-x-auto border border-gray-200 dark:border-gray-700">
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead className="bg-blue-50 dark:bg-gray-700">
@@ -199,18 +190,15 @@ const ChartLibrary: React.FC = () => {
             {ecosystems.map((ecosystem, index) => {
               const counts = getEcosystemRiskCounts(ecosystem);
               const total = counts.Red + counts.Yellow + counts.Green + counts["N/A"];
-              // PYPI와 MAVEN의 Total이 0인 경우 해당 행을 렌더링하지 않도록 필터링 (선택 사항)
               // if (total === 0) return null;
               return (
                 <tr
                   key={index}
                   className="hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                 >
-                  {/* 에코시스템 이름 */}
                   <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium text-gray-900 dark:text-gray-200">
                     {ecosystem.toUpperCase()}
                   </td>
-                  {/* 위험도 카운트 */}
                   <td
                     className="px-6 py-4 whitespace-nowrap text-center text-sm text-red-600 dark:text-red-300"
                     onClick={() => handleChartClick(ecosystem, "Red")}
@@ -250,7 +238,6 @@ const ChartLibrary: React.FC = () => {
   );
 };
 
-// 요약 카드 컴포넌트
 interface SummaryCardProps {
   title: string;
   count: number;
