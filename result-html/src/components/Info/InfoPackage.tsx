@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { FaShieldAlt, FaLink, FaHashtag, FaCodeBranch } from 'react-icons/fa';
-import { useParams, useNavigate } from 'react-router-dom'; // Link 대신 useNavigate 사용
+import { useParams, useNavigate } from 'react-router-dom';
 
 interface PackageCheck {
   full_name: string;
@@ -20,14 +20,14 @@ interface License {
 interface ComponentData {
   package_check?: PackageCheck[];
   ecosystem?: string;
-  licenses?: License[]; // licenses는 이제 객체의 배열
+  licenses?: License[];
   hashes?: string;
   dependencies?: string;
   external_references?: string | string[];
   full_name?: string;
   unique_id?: number;
-  purl?: string; // purl 추가
-  bomref?: string; // bomref 추가
+  purl?: string;
+  bomref?: string;
 }
 
 interface RiskIndicator {
@@ -35,7 +35,6 @@ interface RiskIndicator {
   icon: JSX.Element;
 }
 
-// Risk Level에 따른 색상과 아이콘 반환 함수
 const getRiskIndicator = (riskLevel: string): RiskIndicator => {
   switch (riskLevel.toLowerCase()) {
     case 'critical':
@@ -65,7 +64,6 @@ const getRiskIndicator = (riskLevel: string): RiskIndicator => {
   }
 };
 
-// Risk Level을 텍스트로 변환하는 함수
 const getRiskText = (riskLevel: string): string => {
   switch (riskLevel.toLowerCase()) {
     case 'red':
@@ -85,9 +83,9 @@ const getTyposquattingText = (suspected: string): string => {
 
 const InfoPackage: React.FC = () => {
   const { id, projectName } = useParams<{ id: string; projectName: string }>();
-  const navigate = useNavigate(); // useNavigate 초기화
+  const navigate = useNavigate(); 
   const [componentData, setComponentData] = useState<ComponentData | null>(null);
-  const [allComponents, setAllComponents] = useState<ComponentData[]>([]); // 모든 컴포넌트 상태 추가
+  const [allComponents, setAllComponents] = useState<ComponentData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -106,7 +104,7 @@ const InfoPackage: React.FC = () => {
         return response.json();
       })
       .then((data) => {
-        setAllComponents(data.components); // 모든 컴포넌트 저장
+        setAllComponents(data.components);
         const targetComponent = data.components.find(
           (component: ComponentData) => String(component.unique_id) === id
         );
@@ -160,7 +158,6 @@ const InfoPackage: React.FC = () => {
     }
   }
 
-  // 디펜던시의 unique_id를 찾는 함수 내부로 이동 및 purl 기준으로 수정
   const findUniqueIdByDependency = (depPurl: string, allComponents: ComponentData[]): number | null => {
     const foundComponent = allComponents.find(
       (component) => component.purl?.toLowerCase() === depPurl.toLowerCase()
@@ -170,7 +167,6 @@ const InfoPackage: React.FC = () => {
 
   return (
     <div className="p-8 space-y-8">
-      {/* Security Check Results Section */}
       {package_check && package_check.length > 0 && (
         <div
           className={`p-6 rounded-lg shadow-sm border ${getRiskIndicator(package_check[0]["Risk Level"]).color} bg-white`}
@@ -221,7 +217,6 @@ const InfoPackage: React.FC = () => {
         </div>
       )}
 
-      {/* Package Information Section */}
       <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Ecosystem */}
@@ -233,13 +228,12 @@ const InfoPackage: React.FC = () => {
             </div>
           </div>
 
-          {/* License */}
+
           <div className="flex items-start">
             <FaLink className="text-gray-700 mr-3 text-lg mt-1" />
             <div>
               <p className="text-sm text-gray-600">License</p>
               {licenses && licenses.length > 0 ? (
-                // 라이선스가 배열 형태로 제공될 때 처리
                 <ul className="list-disc pl-5 mt-2 text-base text-gray-800">
                   {licenses.map((license, idx) => (
                     <li key={idx} className="mb-1">
@@ -265,7 +259,6 @@ const InfoPackage: React.FC = () => {
             </div>
           </div>
 
-          {/* Hashes */}
           <div className="flex items-start">
             <FaHashtag className="text-gray-700 mr-3 text-lg mt-1" />
             <div>
@@ -274,7 +267,6 @@ const InfoPackage: React.FC = () => {
             </div>
           </div>
 
-          {/* External References */}
           <div className="flex items-start">
             <FaLink className="text-gray-700 mr-3 text-lg mt-1" />
             <div>
@@ -301,14 +293,12 @@ const InfoPackage: React.FC = () => {
         </div>
       </div>
 
-      {/* Dependencies Section */}
       <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
         <div className="flex items-start">
           <FaCodeBranch className="text-gray-700 mr-3 text-lg mt-1" />
           <div>
             <p className="text-sm text-gray-600">Dependencies</p>
             {formattedDependencies.length > 0 ? (
-              // 디펜던시가 여러 개인 경우 Flexbox로 처리하여 겹치지 않도록 함
               <div className="mt-2 flex flex-wrap gap-2">
                 {formattedDependencies.map((dep, idx) => {
                   const uniqueId = findUniqueIdByDependency(dep, allComponents);
@@ -328,7 +318,6 @@ const InfoPackage: React.FC = () => {
                       {dep}
                     </button>
                   ) : (
-                    // unique_id가 없는 경우 클릭 불가하게 표시
                     <span
                       key={idx}
                       className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm cursor-default"
