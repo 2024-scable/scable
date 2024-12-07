@@ -35,16 +35,16 @@ const ChartVuln: React.FC<ChartVulnProps> = ({
   cveOnlyVulns,
   onBarClick,
 }) => {
-  // 모든 취약점 리스트
+
   const allVulns = useMemo(
     () => [...reachableVulns, ...cveOnlyVulns],
     [reachableVulns, cveOnlyVulns]
   );
 
-  // 심각도 레이블 및 색상
+
   const severityLabels = ['Critical', 'High', 'Medium', 'Low', 'Unknown'];
 
-  // 고유한 취약점들로 맵 생성
+
   const uniqueReachableVulnsMap = useMemo(() => {
     const map = new Map<string, Vulnerability>();
     reachableVulns.forEach((vuln) => {
@@ -69,7 +69,7 @@ const ChartVuln: React.FC<ChartVulnProps> = ({
     return map;
   }, [allVulns]);
 
-  // 고유한 패키지 수 계산
+
   const uniquePackagesSet = useMemo(() => {
     const set = new Set<string>();
     allVulns.forEach((vuln) => {
@@ -82,7 +82,7 @@ const ChartVuln: React.FC<ChartVulnProps> = ({
 
   const totalPackages = uniquePackagesSet.size;
 
-  // 도달 가능한 패키지 수 계산
+
   const uniqueReachablePackagesSet = useMemo(() => {
     const set = new Set<string>();
     reachableVulns.forEach((vuln) => {
@@ -98,7 +98,7 @@ const ChartVuln: React.FC<ChartVulnProps> = ({
   const reachablePackagePercentage =
     totalPackages > 0 ? ((reachablePackages / totalPackages) * 100).toFixed(1) : '0';
 
-  // Reachable 및 Unreachable 취약점의 심각도별 개수 계산 (고유한 CVE 기준)
+
   const severityCounts = useMemo(() => {
     const counts: {
       Reachable: { [key: string]: number };
@@ -131,7 +131,7 @@ const ChartVuln: React.FC<ChartVulnProps> = ({
     return counts;
   }, [uniqueReachableVulnsMap, uniqueCveOnlyVulnsMap, severityLabels]);
 
-  // 시리즈 데이터 설정 (Reachable이 있는 경우와 없는 경우에 따라 다르게 설정)
+
   const series = useMemo(() => {
     if (uniqueReachableVulnsMap.size > 0) {
       return [
@@ -154,16 +154,16 @@ const ChartVuln: React.FC<ChartVulnProps> = ({
     }
   }, [uniqueReachableVulnsMap.size, severityLabels, severityCounts]);
 
-  // 차트 색상 설정 (Reachable과 Unreachable에 따라 다르게 설정)
+
   const chartColors = useMemo(() => {
     if (uniqueReachableVulnsMap.size > 0) {
-      return ['#FF4D4D', '#fdc5c3']; // Reachable - 빨강, Unreachable - 연한 빨강
+      return ['#FF4D4D', '#fdc5c3']; 
     } else {
-      return ['#FF4D4D']; // Unreachable만 표시할 경우 빨강
+      return ['#FF4D4D'];
     }
   }, [uniqueReachableVulnsMap.size]);
 
-  // 차트 옵션 설정
+
   const options: ApexOptions = useMemo(
     () => ({
       chart: {
@@ -179,7 +179,7 @@ const ChartVuln: React.FC<ChartVulnProps> = ({
             if (category) {
               const severityParam = category.toLowerCase();
               onBarClick(severityParam);
-              console.log(`Bar clicked: ${category}`); // 디버깅용 로그
+              console.log(`Bar clicked: ${category}`);
             }
           },
         },
@@ -231,27 +231,22 @@ const ChartVuln: React.FC<ChartVulnProps> = ({
     [chartColors, severityLabels, onBarClick]
   );
 
-  // 총 취약점 수 계산 (고유한 CVE 기준)
   const totalVulns = uniqueAllVulnsMap.size;
   const reachableCount = uniqueReachableVulnsMap.size;
   const reachablePercentage =
     totalVulns > 0 ? ((reachableCount / totalVulns) * 100).toFixed(1) : '0';
 
-  // Ref를 사용하여 차트 인스턴스 관리
   const chartRef = useRef<ReactApexChart>(null);
 
   useEffect(() => {
-    // 컴포넌트 언마운트 시 차트 인스턴스 정리
     return () => {
       if (chartRef.current) {
-        // 필요 시 차트 인스턴스 정리
       }
     };
   }, []);
 
   return (
     <div className="space-y-3">
-      {/* 취약점 정보 강조 */}
       <div className="bg-white dark:bg-gray-800 p-2 rounded-lg flex items-center justify-between">
         <div>
           <ul className="text-gray-600 dark:text-gray-300">
@@ -286,7 +281,6 @@ const ChartVuln: React.FC<ChartVulnProps> = ({
         </div>
       </div>
 
-      {/* 심각도별 Reachable/Unreachable 취약점 분포 차트 */}
       {totalVulns > 0 ? (
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-300">
           <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
