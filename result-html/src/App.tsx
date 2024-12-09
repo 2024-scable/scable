@@ -30,7 +30,6 @@ function App() {
     ) : (
         <DefaultLayout>
             <Routes>
-                {/* 메인 페이지 */}
                 <Route
                     index
                     element={
@@ -41,7 +40,6 @@ function App() {
                     }
                 />
 
-                {/* 동적 경로로 프로젝트 이름에 따라 라우팅 */}
                 <Route path="/:projectName">
 
                     <Route
@@ -53,7 +51,6 @@ function App() {
                             </>
                         }
                     />
-                    {/* 프로젝트별 페이지 */}
                     <Route
                         path="components"
                         element={
