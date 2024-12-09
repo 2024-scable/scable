@@ -116,7 +116,6 @@ const SummaryOne: React.FC = () => {
 
     return (
         <div className="min-h-screen flex flex-col items-center p-4 space-y-4">
-            {/* Header Section */}
             <section className="w-full max-w-8xl bg-gradient-to-r from-blue-100 to-green-100 p-8 rounded-lg shadow-lg mb-6">
                 <div className="flex justify-between items-center">
                     <div>
@@ -137,7 +136,6 @@ const SummaryOne: React.FC = () => {
                             </div>
                         </div>
                     </div>
-                    {/* Download All SBOM Files Button */}
                     <div className="flex items-center space-x-4">
                         <button
                             className={`flex items-center bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-500 ${
@@ -157,10 +155,8 @@ const SummaryOne: React.FC = () => {
                 </div>
             </section>
 
-            {/* Main Content Section */}
             <section className="w-full max-w-8xl grid grid-cols-1 gap-6">
                 <div className="grid grid-cols-1 gap-y-6">
-                    {/* Vulnerability Summary */}
                     <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200 flex flex-col">
                         <div className="flex items-center space-x-2">
                             <FaShieldAlt className="text-red-500 text-2xl" />
@@ -169,7 +165,6 @@ const SummaryOne: React.FC = () => {
                         <DashboardVuln />
                     </div>
 
-                    {/* Package Sources */}
                     <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200 flex flex-col">
                         <div className="flex items-center mb-4 space-x-2">
                             <FaShieldAlt className="text-red-500 text-2xl" />
@@ -178,7 +173,6 @@ const SummaryOne: React.FC = () => {
                         <DashboardLibrary />
                     </div>
 
-                    {/* License Summary */}
                     <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
                         <div className="flex items-center mb-4 space-x-2">
                             <FaFileAlt className="text-purple-500 text-2xl" />
