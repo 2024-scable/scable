@@ -5,7 +5,7 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import SidebarLinkGroup from './SidebarLinkGroup';
 import Logo from '../../images/logo/logo.png';
 import useProjects, { Project } from '../../hooks/useProjects';
-import { FaCog } from 'react-icons/fa'; // FaCog 아이콘 임포트
+import { FaCog } from 'react-icons/fa';
 
 interface SidebarProps {
   sidebarOpen: boolean;
