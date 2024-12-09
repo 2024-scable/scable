@@ -9,7 +9,6 @@ import DashboardVuln from "../../components/Charts/DashboardVuln";
 import DashboardLicense from "../../components/Charts/DashboardLicense";
 import DashboardLibrary from "../../components/Charts/DashboardLibrary";
 
-// SBOM 데이터 타입 정의
 interface SbomData {
     project: string;
     format: string;
@@ -22,7 +21,6 @@ interface SbomData {
     openSourcePackages: number;
     privatePackages: number;
     thirdPartyPackages: number;
-    // 추가 필드 필요 시 정의
 }
 
 const SummaryOne: React.FC = () => {
@@ -40,7 +38,6 @@ const SummaryOne: React.FC = () => {
             setLoading(true);
             setError(null);
             try {
-                // 상대 경로로 sbom-summary.json 파일을 fetch
                 const response = await fetch(`/${projectName}/sbom-summary.json`, { signal });
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -66,14 +63,12 @@ const SummaryOne: React.FC = () => {
         };
     }, [projectName]);
 
-    // 다운로드 파일 목록 정의
     const downloadFiles = [
         { name: "sbom-cyclonedx.json", label: "CycloneDX" },
         { name: "sbom-spdx.json", label: "SPDX" },
         { name: "sbom-swid.xml", label: "SWID" },
     ];
 
-    // Zip 파일 생성 및 다운로드 함수
     const handleDownloadAll = async () => {
         if (!sbomData) {
             alert("다운로드할 데이터가 없습니다.");
@@ -84,7 +79,6 @@ const SummaryOne: React.FC = () => {
         try {
             const zip = new JSZip();
 
-            // 각 파일을 fetch하여 Zip에 추가
             await Promise.all(
                 downloadFiles.map(async (file) => {
                     const response = await fetch(`/${projectName}/${file.name}`);
@@ -96,10 +90,8 @@ const SummaryOne: React.FC = () => {
                 })
             );
 
-            // Zip 파일 생성 (Blob 형식)
             const content = await zip.generateAsync({ type: "blob" });
 
-            // 다운로드
             saveAs(content, `${sbomData.project || "sbom"}-files.zip`);
             alert("파일이 성공적으로 다운로드되었습니다.");
         } catch (error: any) {
