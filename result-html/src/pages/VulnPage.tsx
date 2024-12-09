@@ -52,7 +52,7 @@ const VulnPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // URL의 'severity' 및 'reachability' 쿼리 파라미터 읽기
+
   const queryParams = new URLSearchParams(location.search);
   const severityParam = queryParams.get('severity');
   const reachabilityParam = queryParams.get('reachability');
@@ -60,18 +60,15 @@ const VulnPage: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // sbom-summary.json 로드
         const response = await fetch(`/${projectName}/sbom-summary.json`);
         if (!response.ok) throw new Error('Failed to fetch sbom-summary.json');
         const data = await response.json();
         setVulnData(data);
 
-        // sbom-detail.json 로드
         const sbomResponse = await fetch(`/${projectName}/sbom-detail.json`);
         if (!sbomResponse.ok) throw new Error('Failed to fetch sbom-detail.json');
         const sbomData = await sbomResponse.json();
 
-        // 'components' 배열을 상태로 설정 (존재하지 않으면 빈 배열로 설정)
         if (Array.isArray(sbomData.components)) {
           setSbomDetail(sbomData.components);
         } else {
@@ -79,12 +76,10 @@ const VulnPage: React.FC = () => {
           setSbomDetail([]);
         }
 
-        // reachable.json 로드
         const reachableResponse = await fetch(`/${projectName}/reachable.json`);
         if (!reachableResponse.ok) throw new Error('Failed to fetch reachable.json');
         const reachableJson = await reachableResponse.json();
 
-        // reachableJson이 배열인지 확인하고 상태 설정
         if (Array.isArray(reachableJson)) {
           setReachableData(reachableJson);
         } else {
@@ -102,7 +97,6 @@ const VulnPage: React.FC = () => {
     fetchData();
   }, []);
 
-  // 패키지 이름 정규화 함수 (undefined 처리 추가)
   const normalizePackageName = (name?: string): string => {
     return name ? name.toLowerCase().replace(/[\s\-_.]+/g, '') : '';
   };
@@ -113,7 +107,6 @@ const VulnPage: React.FC = () => {
 
   const vulnSummary: VulnSummary = vulnData["vuln_sum"];
 
-  // Reachable 패키지 이름 목록 생성 (패키지 이름 정규화)
   const reachablePackages = new Set(
     reachableData
       .map(item => {
@@ -127,27 +120,22 @@ const VulnPage: React.FC = () => {
       .filter(name => name !== '')
   );
 
-  // 중복 제거를 위한 Set 생성
   const vulnSet = new Set<string>();
 
-  // Reachable하고 CVE가 있는 취약점 목록
   const reachableVulns: Vulnerability[] = [];
-  // CVE만 있고 Reachable하지 않은 취약점 목록
   const cveOnlyVulns: Vulnerability[] = [];
 
   sbomDetail.forEach(pkg => {
     if (!pkg.name) {
       console.warn('Package name is missing:', pkg);
-      return; // 패키지 이름이 없으면 건너뜁니다.
+      return; 
     }
     if (pkg.vulnerabilities && pkg.vulnerabilities.length > 0) {
       pkg.vulnerabilities.forEach(vuln => {
-        // 취약점의 고유 키 생성 (CVE ID + 패키지 이름)
         const vulnKey = `${vuln.cve_id}-${pkg.name}`;
         if (!vulnSet.has(vulnKey)) {
           vulnSet.add(vulnKey);
 
-          // 패키지 이름을 정규화하여 비교
           const pkgNameNormalized = normalizePackageName(pkg.name);
 
           if (reachablePackages.has(pkgNameNormalized)) {
@@ -160,7 +148,6 @@ const VulnPage: React.FC = () => {
     }
   });
 
-  // 필터 핸들러 함수
   const handleSeverityFilter = (severity: string | null, reachability: string | null) => {
     const params = new URLSearchParams();
     if (severity) params.set('severity', severity);
