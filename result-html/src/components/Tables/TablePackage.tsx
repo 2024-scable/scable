@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 
-// TypeScript 인터페이스 정의
+
 interface Vulnerability {
     cve_id: string;
     severity: string;
@@ -16,7 +16,6 @@ interface Vulnerability {
 interface PackageCheck {
     "Risk Level": string;
     Score?: number;
-    // 기타 필요한 필드가 있다면 추가
 }
 
 interface License {
@@ -40,8 +39,8 @@ interface SBOMComponent {
 type SortOrder = 'asc' | 'desc';
 
 interface SortState {
-    sortedBy: keyof SortableColumns | null; // 현재 정렬된 열
-    order: SortOrder; // 정렬 순서
+    sortedBy: keyof SortableColumns | null; 
+    order: SortOrder; 
 }
 
 type SortableColumns = 'name' | 'cve' | 'severity' | 'typeColor';
@@ -52,7 +51,7 @@ const TablePackage: React.FC = () => {
     const [filter, setFilter] = useState<string>('ALL');
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [sortState, setSortState] = useState<SortState>({
-        sortedBy: null, // 초기에는 정렬되지 않음
+        sortedBy: null,
         order: 'asc',
     });
     const [loading, setLoading] = useState<boolean>(true);
@@ -97,7 +96,6 @@ const TablePackage: React.FC = () => {
         fetchSBOMData();
     }, [projectName, location.search]); // location.search 추가
 
-    // 쿼리 파라미터에 따른 데이터 필터링
     const filteredData = useMemo(() => {
         let tempData = [...data];
 
@@ -136,7 +134,6 @@ const TablePackage: React.FC = () => {
         return tempData;
     }, [location.search, data]);
 
-    // 검색 및 필터링
     const searchedData = useMemo(() => {
         if (!searchTerm) return filteredData;
 
@@ -170,7 +167,6 @@ const TablePackage: React.FC = () => {
         return result;
     }, [filteredData, searchTerm, filter]);
 
-    // 정렬 로직 수정: 기본 정렬을 위험도 우선으로 변경
     const sortedData = useMemo(() => {
         if (sortState.sortedBy) {
             return [...searchedData].sort((a, b) => {
@@ -227,7 +223,6 @@ const TablePackage: React.FC = () => {
             });
         }
 
-        // 기본 정렬: 위험도 우선, 그 다음 취약점 개수
         const severityRank: { [key: string]: number } = {
             critical: 1,
             high: 2,
@@ -274,7 +269,6 @@ const TablePackage: React.FC = () => {
         return sorted;
     }, [searchedData, sortState]);
 
-    // 페이징 처리
     const paginatedData = useMemo(() => {
         const indexOfLastItem = currentPage * itemsPerPage;
         const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -285,7 +279,6 @@ const TablePackage: React.FC = () => {
         return Math.ceil(sortedData.length / itemsPerPage);
     }, [sortedData.length]);
 
-    // 페이지 번호 생성
     const getPageNumbers = (): number[] => {
         const visiblePages = 5;
         let startPage = Math.max(1, currentPage - Math.floor(visiblePages / 2));
@@ -299,7 +292,6 @@ const TablePackage: React.FC = () => {
         return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
     };
 
-    // 위험 수준 색상 매핑
     const getRiskLevelColor = (riskLevel?: string): string => {
         switch (riskLevel?.toLowerCase()) {
             case 'red':
@@ -315,7 +307,6 @@ const TablePackage: React.FC = () => {
         }
     };
 
-    // 취약성 심각도 색상 매핑
     const getSeverityColor = (severity?: string): string => {
         switch (severity?.toLowerCase()) {
             case 'critical':
@@ -331,7 +322,6 @@ const TablePackage: React.FC = () => {
         }
     };
 
-    // 정렬 이벤트 핸들러
     const handleSort = (type: keyof SortableColumns) => {
         setSortState(prev => ({
             sortedBy: type,
@@ -339,29 +329,24 @@ const TablePackage: React.FC = () => {
         }));
     };
 
-    // 검색 이벤트 핸들러
     const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value.toLowerCase());
-        setCurrentPage(1); // 검색 시 페이지 초기화
+        setCurrentPage(1);
     };
 
-    // 필터 변경 핸들러
     const handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setFilter(event.target.value);
         setSearchTerm('');
-        setCurrentPage(1); // 필터 변경 시 페이지 초기화
+        setCurrentPage(1); 
     };
 
-    // 페이지 변경 핸들러
     const handlePageChange = (pageNumber: number) => {
         if (pageNumber < 1 || pageNumber > totalPages) return;
         setCurrentPage(pageNumber);
     };
 
-    // 렌더링
     return (
         <div className="rounded-sm bg-white px-5 pt-6 pb-4 dark:bg-boxdark sm:px-7 xl:pb-1 text-base">
-            {/* 로딩 및 오류 상태 처리 */}
             {loading ? (
                 <div className="flex justify-center items-center h-full">
                     <p>Loading...</p>
@@ -372,7 +357,6 @@ const TablePackage: React.FC = () => {
                 </div>
             ) : (
                 <>
-                    {/* 검색 및 필터링 섹션 */}
                     <div className="mb-4 flex flex-col md:flex-row items-center gap-2">
                         <select
                             value={filter}
@@ -395,7 +379,6 @@ const TablePackage: React.FC = () => {
                         />
                     </div>
 
-                    {/* 패키지 테이블 */}
                     <div className="overflow-x-auto">
                         <table className="min-w-full bg-white table-fixed text-sm">
                             <thead>
@@ -489,7 +472,6 @@ const TablePackage: React.FC = () => {
                                                 </td>
                                                 <td className="py-3 px-3 text-center">
                                                     {item.vulnerabilities && item.vulnerabilities.length > 0 ? (
-                                                        // 취약성 리스트를 심각도 높은 순으로 정렬하여 표시
                                                         [...item.vulnerabilities].sort((a, b) => {
                                                             const severityOrder: { [key: string]: number } = {
                                                                 critical: 1,
@@ -510,7 +492,6 @@ const TablePackage: React.FC = () => {
                                                 </td>
                                                 <td className="py-3 px-3 text-center">
                                                     {item.vulnerabilities && item.vulnerabilities.length > 0 ? (
-                                                        // 취약성 리스트를 심각도 높은 순으로 정렬하여 표시
                                                         [...item.vulnerabilities].sort((a, b) => {
                                                             const severityOrder: { [key: string]: number } = {
                                                                 critical: 1,
@@ -545,7 +526,6 @@ const TablePackage: React.FC = () => {
                         </table>
                     </div>
 
-                    {/* 페이징 네비게이션 */}
                     {totalPages > 1 && (
                         <div className="flex justify-center mt-4 space-x-2 text-sm">
                             <button
