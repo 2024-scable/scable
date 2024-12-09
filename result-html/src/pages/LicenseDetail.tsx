@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import * as XLSX from 'xlsx';
 
-// 인터페이스 정의
 interface LicenseData {
     id: number;
     spdx_identifier: string;
@@ -47,7 +46,6 @@ interface Vulnerability {
     cve_link: string;
 }
 
-// Restriction Table 컴포넌트
 const RestrictionTable: React.FC = () => (
     <table className="w-full text-left mt-5 border-collapse border border-gray-600 text-sm">
         <thead className="bg-gray-800 text-white">
@@ -57,7 +55,6 @@ const RestrictionTable: React.FC = () => (
             </tr>
         </thead>
         <tbody className="bg-gray-100">
-            {/* Restriction 항목들 */}
             <tr>
                 <td className="px-2 py-1 border border-gray-600">Non-Commercial Use</td>
                 <td className="px-2 py-1 border border-gray-600">상업적 사용 불가 (기업에서 제공하는 무료 소프트웨어 사용 불가)</td>
@@ -114,7 +111,6 @@ const RestrictionTable: React.FC = () => (
     </table>
 );
 
-// Disclosure Table 컴포넌트
 const DisclosureTable: React.FC = () => (
     <table className="w-full text-left mt-5 border-collapse border border-gray-600 text-sm">
         <thead className="bg-gray-800 text-white">
@@ -124,7 +120,6 @@ const DisclosureTable: React.FC = () => (
             </tr>
         </thead>
         <tbody className="bg-gray-100">
-            {/* Disclosure 항목들 */}
             <tr>
                 <td className="px-2 py-1 border border-gray-600">NONE</td>
                 <td className="px-2 py-1 border border-gray-600">공개 의무 없음</td>
@@ -165,7 +160,6 @@ const DisclosureTable: React.FC = () => (
     </table>
 );
 
-// LicenseDetail 컴포넌트
 const LicenseDetail: React.FC = () => {
     const { licensename, projectName } = useParams<{ licensename: string; projectName: string }>();
     const [licenseData, setLicenseData] = useState<LicenseData | null>(null);
@@ -247,24 +241,20 @@ const LicenseDetail: React.FC = () => {
         return "bg-gray-100 text-gray-500";
     };
 
-    // Restriction 스타일 함수
     const getRestrictionStyle = (restriction: string) => {
         if (restriction === 'Y') return 'text-yellow-600 bg-yellow-100';
         if (restriction === 'R') return 'text-red-600 bg-red-100';
-        return 'text-gray-600 bg-gray-100'; // 기본 색상
+        return 'text-gray-600 bg-gray-100';
     };
 
-    // "Show More" 버튼 핸들러
     const handleShowMore = () => {
         setVisibleCount((prevCount) => prevCount + 12);
     };
 
-    // "View All" 버튼 핸들러
     const handleViewAll = () => {
         setVisibleCount(packageList.length);
     };
 
-    // 라이선스 데이터가 없을 경우
     if (!licenseData) {
         return (
             <div className="p-8 bg-gray-50 min-h-screen flex flex-col items-center">
@@ -277,11 +267,10 @@ const LicenseDetail: React.FC = () => {
     }
 
     return (
-        <div className="p-8 bg-gray-50 min-h-screen flex flex-col items-center">
+        <div className="p-2 min-h-screen flex flex-col items-center">
             <div className="bg-white rounded-3xl shadow-lg max-w-5xl w-full p-8">
-                <h1 className="text-3xl font-extrabold mb-6 text-gray-800">License Details</h1>
+                <h1 className="text-3xl font-extrabold mb-8 text-gray-800">License Details</h1>
 
-                {/* 라이선스 기본 정보 */}
                 <div className="mb-8 flex items-center justify-between">
                     <div>
                         <h2 className="text-xl font-bold text-gray-700">{licenseData.name}</h2>
@@ -300,7 +289,35 @@ const LicenseDetail: React.FC = () => {
                     </span>
                 </div>
 
-                {/* Approval & Compatibility 섹션 */}
+                <div className="grid grid-cols-3 gap-4 mb-8">
+                    <div className={`p-4 rounded-lg shadow-md flex flex-col items-center ${getRestrictionStyle(licenseData.restriction)}`}>
+                        <div className="text-3xl text-blue-600">🚨</div>
+                        <h3 className="text-lg font-bold">Restriction</h3>
+                        <p className="text-xs text-center">
+                            {(licenseData.restrictionDetails || 'N/A').split(',').map((item, index) => (
+                                <span key={index}>
+                                    {item.trim()}
+                                    <br />
+                                </span>
+                            ))}
+                        </p>
+                    </div>
+                    <div className="p-4 bg-white rounded-lg shadow-md flex flex-col items-center">
+                        <div className="text-3xl text-yellow-600">⚠️</div>
+                        <h3 className="text-lg font-bold">Disclosure</h3>
+                        <p className="text-xs text-gray-600">
+                            {licenseData.disclosure || 'N/A'}
+                        </p>
+                    </div>
+                    <div className="p-4 bg-white rounded-lg shadow-md flex flex-col items-center">
+                        <div className="text-3xl text-green-600">🔔</div>
+                        <h3 className="text-lg font-bold">Notification</h3>
+                        <p className="text-xs text-gray-600">
+                            {licenseData.notification || 'N/A'}
+                        </p>
+                    </div>
+                </div>
+
                 <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
                     <h3 className="text-lg font-semibold mb-2 text-gray-600">Approval & Compatibility</h3>
                     <div className="grid grid-cols-2 gap-4">
@@ -356,40 +373,8 @@ const LicenseDetail: React.FC = () => {
                 </div>
                 <hr className="my-10 border-t border-gray-300" />
 
-                {/* 라이선스 세부 정보 섹션 */}
-                <div className="grid grid-cols-3 gap-4 mb-8">
-                    {/* Restriction Section */}
-                    <div className={`p-4 rounded-lg shadow-md flex flex-col items-center ${getRestrictionStyle(licenseData.restriction)}`}>
-                        <div className="text-3xl text-blue-600">🚨</div>
-                        <h3 className="text-lg font-bold">Restriction</h3>
-                        <p className="text-xs text-center">
-                            {(licenseData.restrictionDetails || 'N/A').split(',').map((item, index) => (
-                                <span key={index}>
-                                    {item.trim()}
-                                    <br />
-                                </span>
-                            ))}
-                        </p>
-                    </div>
-                    {/* Disclosure Section */}
-                    <div className="p-4 bg-white rounded-lg shadow-md flex flex-col items-center">
-                        <div className="text-3xl text-yellow-600">⚠️</div>
-                        <h3 className="text-lg font-bold">Disclosure</h3>
-                        <p className="text-xs text-gray-600">
-                            {licenseData.disclosure || 'N/A'}
-                        </p>
-                    </div>
-                    {/* Notification Section */}
-                    <div className="p-4 bg-white rounded-lg shadow-md flex flex-col items-center">
-                        <div className="text-3xl text-green-600">🔔</div>
-                        <h3 className="text-lg font-bold">Notification</h3>
-                        <p className="text-xs text-gray-600">
-                            {licenseData.notification || 'N/A'}
-                        </p>
-                    </div>
-                </div>
+                
 
-                {/* 패키지 목록 섹션 */}
                 <div className="mt-10">
                     <h2 className="text-xl font-semibold mb-4 cursor-pointer" onClick={() => setIsPackageListOpen(!isPackageListOpen)}>
                         Packages Using {licensename}
@@ -428,7 +413,6 @@ const LicenseDetail: React.FC = () => {
                     )}
                 </div>
 
-                {/* Restriction 및 Disclosure 테이블 */}
                 <div className="mt-10">
                     <h2 className="text-xl font-semibold mb-4">Restriction Descriptions</h2>
                     <RestrictionTable />
