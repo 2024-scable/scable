@@ -103,10 +103,8 @@ const InfoVuln: React.FC<InfoVulnProps> = ({
     ? getRiskIndicator(packageInfo['Risk Level'])
     : getRiskIndicator('');
 
-  // 현재 패키지의 이름을 정규화
   const normalizedPackageName = normalizeString(fullName);
 
-  // reachableData를 필터링하여 현재 패키지와 관련된 항목만 남김
   const filteredReachableData = reachableData.filter((reachable) => {
     const reachableLibrary = reachable['reachable-library'];
     if (reachableLibrary) {
@@ -118,7 +116,6 @@ const InfoVuln: React.FC<InfoVulnProps> = ({
 
   return (
     <div className="p-8 space-y-8">
-      {/* Reachable Details 섹션 */}
       {filteredReachableData && filteredReachableData.length > 0 && (
         <div>
           <h2 className="text-2xl font-bold text-red-500 mb-2">Reachable Details</h2>
@@ -143,7 +140,6 @@ const InfoVuln: React.FC<InfoVulnProps> = ({
         </div>
       )}
 
-      {/* CVE 목록 섹션 */}
       {vulnerabilities.length ? (
         <div>
           <h2 className="text-2xl font-bold text-red-500 mb-2">Vulnerabilities</h2>
