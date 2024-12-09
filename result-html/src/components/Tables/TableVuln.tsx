@@ -63,12 +63,11 @@ const TableVuln: React.FC<TableVulnProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const itemsPerPage = 20; // 페이지당 항목 수를 20으로 설정
+  const itemsPerPage = 20;
   const [groupMode, setGroupMode] = useState<'byPackage' | 'byCVE'>('byPackage');
 
-  const { projectName } = useParams(); // 현재 URL에서 projectName 가져오기
+  const { projectName } = useParams();
 
-  // 모든 취약점을 합치고 'reachable' 및 'component_id' 속성을 추가
   const allVulns = useMemo(() => {
     const vulns: (Vulnerability & { reachable: boolean; component_id: number | null })[] = [];
 
@@ -78,7 +77,6 @@ const TableVuln: React.FC<TableVulnProps> = ({
     ) => {
       vulnList.forEach((vuln) => {
         try {
-          // 패키지 이름과 버전에 매칭되는 컴포넌트를 찾음
           const component = sbomDetail.find(
             (comp) =>
               comp.name === vuln.packageName &&
@@ -102,7 +100,6 @@ const TableVuln: React.FC<TableVulnProps> = ({
     return vulns;
   }, [reachableVulns, cveOnlyVulns, sbomDetail]);
 
-  // 검색어 및 필터에 따라 취약점을 필터링
   const filteredVulns = useMemo(() => {
     const term = searchTerm.toLowerCase();
 
@@ -128,7 +125,6 @@ const TableVuln: React.FC<TableVulnProps> = ({
     });
   }, [allVulns, searchTerm, selectedSeverity, selectedReachability]);
 
-  // 그룹 모드에 따라 취약점을 그룹화
   const groupedVulns = useMemo(() => {
     if (groupMode === 'byPackage') {
       const packageGroups: {
@@ -150,19 +146,17 @@ const TableVuln: React.FC<TableVulnProps> = ({
               packageName: vuln.packageName,
               packageVersion: vuln.packageVersion,
               component_id: vuln.component_id,
-              reachable: false, // 초기값 설정
+              reachable: false,
               highestSeverity: severityOrder[vuln.severity.toLowerCase()] || severityOrder['unknown'],
               vulns: [],
             };
           }
           packageGroups[key].vulns.push(vuln);
 
-          // Reachable 상태 업데이트
           if (vuln.reachable) {
             packageGroups[key].reachable = true;
           }
 
-          // 최고 심각도 업데이트
           const vulnSeverityValue = severityOrder[vuln.severity.toLowerCase()] || severityOrder['unknown'];
           if (vulnSeverityValue < packageGroups[key].highestSeverity) {
             packageGroups[key].highestSeverity = vulnSeverityValue;
@@ -172,7 +166,6 @@ const TableVuln: React.FC<TableVulnProps> = ({
         }
       });
 
-      // 각 패키지 그룹 내의 취약점을 심각도 순으로 정렬
       Object.values(packageGroups).forEach((group) => {
         group.vulns.sort((a, b) => {
           const aSeverity = severityOrder[a.severity.toLowerCase()] || severityOrder['unknown'];
@@ -181,23 +174,18 @@ const TableVuln: React.FC<TableVulnProps> = ({
         });
       });
 
-      // 배열로 변환하고 패키지 그룹 정렬
       return Object.values(packageGroups).sort((a, b) => {
-        // 1. Reachable 패키지를 우선
         if (a.reachable !== b.reachable) {
           return a.reachable ? -1 : 1;
         }
 
-        // 2. 최고 심각도 순으로 정렬
         if (a.highestSeverity !== b.highestSeverity) {
           return a.highestSeverity - b.highestSeverity;
         }
 
-        // 3. 패키지명으로 정렬
         const nameComparison = a.packageName.localeCompare(b.packageName);
         if (nameComparison !== 0) return nameComparison;
 
-        // 4. 버전으로 정렬
         return a.packageVersion.localeCompare(b.packageVersion, undefined, {
           numeric: true,
         });
@@ -225,18 +213,16 @@ const TableVuln: React.FC<TableVulnProps> = ({
               severity: vuln.severity,
               score: vuln.score,
               vulns: [],
-              reachable: false, // 초기값 설정
+              reachable: false,
               severityValue: severityOrder[vuln.severity.toLowerCase()] || severityOrder['unknown'],
             };
           }
           cveGroups[key].vulns.push(vuln);
 
-          // Reachable 상태 업데이트
           if (vuln.reachable) {
             cveGroups[key].reachable = true;
           }
 
-          // 최고 심각도 업데이트
           const vulnSeverityValue = severityOrder[vuln.severity.toLowerCase()] || severityOrder['unknown'];
           if (vulnSeverityValue < cveGroups[key].severityValue) {
             cveGroups[key].severityValue = vulnSeverityValue;
@@ -248,7 +234,6 @@ const TableVuln: React.FC<TableVulnProps> = ({
         }
       });
 
-      // 각 CVE 그룹 내의 취약점을 패키지명 순으로 정렬
       Object.values(cveGroups).forEach((group) => {
         group.vulns.sort((a, b) => {
           const nameComparison = a.packageName.localeCompare(b.packageName);
@@ -259,19 +244,15 @@ const TableVuln: React.FC<TableVulnProps> = ({
         });
       });
 
-      // 배열로 변환하고 CVE 그룹 정렬
       return Object.values(cveGroups).sort((a, b) => {
-        // 1. Reachable CVE를 우선
         if (a.reachable !== b.reachable) {
           return a.reachable ? -1 : 1;
         }
 
-        // 2. 심각도 순으로 정렬
         if (a.severityValue !== b.severityValue) {
           return a.severityValue - b.severityValue;
         }
 
-        // 3. CVE ID로 정렬
         return a.cve_id.localeCompare(b.cve_id);
       });
     } else {
@@ -279,7 +260,6 @@ const TableVuln: React.FC<TableVulnProps> = ({
     }
   }, [filteredVulns, groupMode]);
 
-  // 페이지네이션 로직
   const totalPages = useMemo(() => {
     return Math.ceil(groupedVulns.length / itemsPerPage);
   }, [groupedVulns.length, itemsPerPage]);
@@ -297,7 +277,6 @@ const TableVuln: React.FC<TableVulnProps> = ({
         Vulnerability Details
       </h3>
 
-      {/* 그룹 모드 선택 버튼 */}
       <div className="mb-4 flex space-x-2">
         <button
           className={`px-4 py-2 rounded ${
@@ -317,7 +296,6 @@ const TableVuln: React.FC<TableVulnProps> = ({
         </button>
       </div>
 
-      {/* 검색 입력 필드 */}
       <div className="mb-4">
         <input
           type="text"
@@ -333,12 +311,10 @@ const TableVuln: React.FC<TableVulnProps> = ({
 
       {paginatedVulns.length > 0 ? (
         <>
-          {/* 테이블 레이아웃 */}
           <div className="overflow-x-auto">
             <table className="min-w-full bg-white dark:bg-gray-700 rounded-lg overflow-hidden table-fixed">
               {groupMode === 'byPackage' ? (
                 <>
-                  {/* 패키지 그룹화 테이블 헤더 */}
                   <thead className="bg-gray-200 dark:bg-gray-600">
                     <tr>
                       <th className="py-1 px-1 text-center text-sm font-semibold text-gray-700 dark:text-gray-200 w-12">
@@ -364,7 +340,6 @@ const TableVuln: React.FC<TableVulnProps> = ({
                       </th>
                     </tr>
                   </thead>
-                  {/* 테이블 바디 */}
                   <tbody>
                     {paginatedVulns.map((group, index) => {
                       const vulnCount = group.vulns.length;
@@ -377,7 +352,6 @@ const TableVuln: React.FC<TableVulnProps> = ({
                               : 'bg-white-50 dark:bg-white-900'
                           } hover:bg-gray-100 dark:hover:bg-gray-700`}
                         >
-                          {/* 번호 */}
                           {idx === 0 ? (
                             <td
                               className="py-2 px-2 text-center w-12"
@@ -423,7 +397,6 @@ const TableVuln: React.FC<TableVulnProps> = ({
                               )}
                             </td>
                           ) : null}
-                          {/* Version */}
                           {idx === 0 ? (
                             <td
                               className="py-2 px-2 text-center w-20"
@@ -432,7 +405,6 @@ const TableVuln: React.FC<TableVulnProps> = ({
                               {group.packageVersion}
                             </td>
                           ) : null}
-                          {/* CVE ID */}
                           <td className="py-2 px-2 text-left w-40">
                             <a
                               href={vuln.cve_link}
@@ -443,7 +415,6 @@ const TableVuln: React.FC<TableVulnProps> = ({
                               {vuln.cve_id}
                             </a>
                           </td>
-                          {/* Severity */}
                           <td className="py-2 px-2 text-center w-24">
                             <span
                               className="inline-flex items-center justify-center px-2 py-1 text-xs font-semibold rounded-full"
@@ -465,7 +436,6 @@ const TableVuln: React.FC<TableVulnProps> = ({
                                 vuln.severity.slice(1)}
                             </span>
                           </td>
-                          {/* Score */}
                           <td className="py-2 px-2 text-center w-16">
                             {vuln.score}
                           </td>
@@ -476,7 +446,6 @@ const TableVuln: React.FC<TableVulnProps> = ({
                 </>
               ) : groupMode === 'byCVE' ? (
                 <>
-                  {/* CVE ID 그룹화 테이블 헤더 */}
                   <thead className="bg-gray-200 dark:bg-gray-600">
                     <tr>
                       <th className="py-1 px-1 text-center text-sm font-semibold text-gray-700 dark:text-gray-200 w-12">
@@ -502,7 +471,6 @@ const TableVuln: React.FC<TableVulnProps> = ({
                       </th>
                     </tr>
                   </thead>
-                  {/* 테이블 바디 */}
                   <tbody>
                     {paginatedVulns.map((group, index) => {
                       const vulnCount = group.vulns.length;
@@ -515,7 +483,6 @@ const TableVuln: React.FC<TableVulnProps> = ({
                               : 'bg-white-50 dark:bg-white-900'
                           } hover:bg-gray-100 dark:hover:bg-gray-700`}
                         >
-                          {/* 번호 */}
                           {idx === 0 ? (
                             <td
                               className="py-2 px-2 text-center w-12"
@@ -524,7 +491,6 @@ const TableVuln: React.FC<TableVulnProps> = ({
                               {(currentPage - 1) * itemsPerPage + index + 1}
                             </td>
                           ) : null}
-                          {/* Reachable */}
                           {idx === 0 ? (
                             <td
                               className="py-2 px-2 text-center w-16"
@@ -543,7 +509,6 @@ const TableVuln: React.FC<TableVulnProps> = ({
                               )}
                             </td>
                           ) : null}
-                          {/* CVE ID */}
                           {idx === 0 ? (
                             <td
                               className="py-2 px-2 text-left w-40"
@@ -559,7 +524,6 @@ const TableVuln: React.FC<TableVulnProps> = ({
                               </a>
                             </td>
                           ) : null}
-                          {/* Severity */}
                           {idx === 0 ? (
                             <td
                               className="py-2 px-2 text-center w-24"
@@ -586,7 +550,6 @@ const TableVuln: React.FC<TableVulnProps> = ({
                               </span>
                             </td>
                           ) : null}
-                          {/* Score */}
                           {idx === 0 ? (
                             <td
                               className="py-2 px-2 text-center w-16"
@@ -595,7 +558,6 @@ const TableVuln: React.FC<TableVulnProps> = ({
                               {group.score}
                             </td>
                           ) : null}
-                          {/* Package */}
                           <td className="py-2 px-2 text-left w-32">
                             {vuln.component_id && projectName ? (
                               <Link
@@ -608,7 +570,6 @@ const TableVuln: React.FC<TableVulnProps> = ({
                               <span className="text-gray-500">{vuln.packageName}</span>
                             )}
                           </td>
-                          {/* Version */}
                           <td className="py-2 px-2 text-center w-20">
                             {vuln.packageVersion}
                           </td>
@@ -621,7 +582,6 @@ const TableVuln: React.FC<TableVulnProps> = ({
             </table>
           </div>
 
-          {/* 페이지네이션 */}
           <div className="mt-4 flex justify-between items-center">
             <button
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
