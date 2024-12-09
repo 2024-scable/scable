@@ -25,11 +25,9 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
     storedSidebarExpanded === null ? false : storedSidebarExpanded === 'true'
   );
 
-  // 프로젝트 데이터 사용
   const { groupedProjects, sortedProjectNames, loading, error } = useProjects();
   const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set());
 
-  // 클릭 외부 닫기
   useEffect(() => {
     const clickHandler = ({ target }: MouseEvent) => {
       if (!sidebar.current || !trigger.current) return;
@@ -45,7 +43,6 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
     return () => document.removeEventListener('click', clickHandler);
   }, [sidebarOpen, setSidebarOpen]);
 
-  // Esc 키로 사이드바 닫기
   useEffect(() => {
     const keyHandler = ({ key }: KeyboardEvent) => {
       if (!sidebarOpen || key !== 'Escape') return;
@@ -55,7 +52,6 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
     return () => document.removeEventListener('keydown', keyHandler);
   }, [sidebarOpen, setSidebarOpen]);
 
-  // Sidebar 확장 상태 저장
   useEffect(() => {
     localStorage.setItem('sidebar-expanded', sidebarExpanded.toString());
     if (sidebarExpanded) {
@@ -76,8 +72,8 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
   };
 
   const handleViewClick = (projectId: string) => {
-    setSidebarOpen(false); // 사이드바 닫기
-    navigate(`/${projectId}`); // 네비게이션
+    setSidebarOpen(false); 
+    navigate(`/${projectId}`);
   };
 
   if (loading) {
@@ -89,7 +85,6 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
         } lg:translate-x-0 lg:static`}
         style={{ width: '15rem' }}
       >
-        {/* SIDEBAR HEADER */}
         <div className="flex items-center justify-between px-6 py-5.5 lg:py-6.5">
           <NavLink to="/">
             <img src={Logo} alt="Logo" />
@@ -116,9 +111,7 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
             </svg>
           </button>
         </div>
-        {/* SIDEBAR HEADER */}
 
-        {/* 로딩 표시 */}
         <div className="flex-1 flex items-center justify-center">
           <span className="text-gray-700">로딩 중...</span>
         </div>
@@ -135,7 +128,6 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
         } lg:translate-x-0 lg:static`}
         style={{ width: '15rem' }}
       >
-        {/* SIDEBAR HEADER */}
         <div className="flex items-center justify-between px-6 py-5.5 lg:py-6.5">
           <NavLink to="/">
             <img src={Logo} alt="Logo" />
@@ -162,9 +154,7 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
             </svg>
           </button>
         </div>
-        {/* SIDEBAR HEADER */}
 
-        {/* 에러 메시지 표시 */}
         <div className="flex-1 flex items-center justify-center">
           <span className="text-red-500">{error}</span>
         </div>
@@ -178,9 +168,8 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
       className={`fixed inset-y-0 left-0 z-50 flex flex-col w-60 bg-[#f4f4f4] transform transition-transform duration-300 ease-in-out ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       } lg:translate-x-0 lg:static`}
-      style={{ width: '15rem' }} // 고정 너비 유지
+      style={{ width: '15rem' }}
     >
-      {/* SIDEBAR HEADER */}
       <div className="flex items-center justify-between px-6 py-5.5 lg:py-6.5">
         <NavLink to="/">
           <img src={Logo} alt="Logo" />
@@ -209,19 +198,14 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
         
       </div>
       
-      {/* SIDEBAR HEADER */}
 
       <div className="flex flex-col overflow-y-auto px-4 lg:px-6">
-        {/* Sidebar Menu */}
         <nav className="mt-5 lg:mt-5">
-          {/* 프로젝트 그룹화 및 정렬된 이름 순으로 반복 */}
           {sortedProjectNames.map((projectName, index) => {
             const projectGroup = groupedProjects[projectName];
             return (
               <div key={projectName} className="mb-4">
-                {/* Menu Group Header */}
                 <h3 className="mb-2 ml-4 flex items-center text-lg font-semibold text-gray-800">
-                  {/* 아이콘 추가 */}
                   <svg
                     className="mr-2 h-4 w-4 fill-current text-gray-600"
                     viewBox="0 0 24 24"
@@ -231,7 +215,6 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
                   {projectName}
                 </h3>
 
-                {/* 프로젝트 리스트 */}
                 <ul className="mb-6 flex flex-col gap-1.5">
                   {projectGroup.map((project) => (
                     <SidebarLinkGroup key={project.id}>
@@ -249,10 +232,9 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
                               whiteSpace: 'nowrap',
                               overflow: 'hidden',
                               textOverflow: 'ellipsis',
-                            }} // 오버플로우 방지
+                            }}
                           >
-                            <span className="text-sm text-gray-500">{project.createdAt}</span> {/* 글씨 크기 조정 */}
-                            {/* 화살표 아이콘 */}
+                            <span className="text-sm text-gray-500">{project.createdAt}</span> 
                             <svg
                               className={`ml-auto h-4 w-4 transform transition-transform duration-200 ${
                                 open ? 'rotate-180' : ''
@@ -267,13 +249,12 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
                               />
                             </svg>
                           </button>
-                          {/* 하위 메뉴 */}
                           <div className={`${!open && 'hidden'}`}>
                             <ul className="mt-1 flex flex-col gap-1.5 pl-6">
                               <li>
                                 <NavLink
                                   to={`/${project.id}`}
-                                  end // 정확한 경로 매칭을 위해 추가
+                                  end
                                   className={({ isActive }) =>
                                     'flex items-center gap-2.5 rounded-md px-4 py-2 text-sm text-gray-600 hover:text-gray-800 ' +
                                     (isActive ? 'text-gray-800 font-semibold' : '')
@@ -343,9 +324,7 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
             );
           })}
         </nav>
-        {/* Sidebar Menu */}
       </div>
-      {/* Settings Menu fixed at bottom */}
       <div className="border-t border-gray-200 p-4">
           <a
             href="http://127.0.0.1:8282/settings"
