@@ -360,7 +360,6 @@ const TableVuln: React.FC<TableVulnProps> = ({
                               {(currentPage - 1) * itemsPerPage + index + 1}
                             </td>
                           ) : null}
-                          {/* Reachable */}
                           {idx === 0 ? (
                             <td
                               className="py-2 px-2 text-center w-16"
@@ -379,7 +378,6 @@ const TableVuln: React.FC<TableVulnProps> = ({
                               )}
                             </td>
                           ) : null}
-                          {/* Package */}
                           {idx === 0 ? (
                             <td
                               className="py-2 px-2 text-left w-32"
