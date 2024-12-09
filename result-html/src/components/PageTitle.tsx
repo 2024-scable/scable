@@ -12,7 +12,7 @@ const PageTitle: React.FC<PageTitleProps> = ({ title }) => {
     document.title = title;
   }, [location, title]);
 
-  return null; // This component doesn't render anything
+  return null;
 };
 
 export default PageTitle;
