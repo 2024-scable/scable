@@ -16,7 +16,6 @@ import InfoPackage from '../../src/components/Info/InfoPackage';
 import InfoVuln from '../../src/components/Info/InfoVuln';
 import References from '../../src/components/Info/References';
 
-// 새로운 License 인터페이스 정의
 interface License {
   license_name: string;
   license_url?: string;
@@ -51,9 +50,9 @@ interface PackageDetailProps {
   group?: string;
   name: string;
   version: string;
-  licenses: License[]; // 수정: licenses를 배열로 변경
+  licenses: License[];
   hashes: string;
-  external_references: string[]; // 수정: external_references를 배열로 변경
+  external_references: string[];
   type: string;
   ecosystem: string;
   bom_ref: string;
@@ -73,7 +72,6 @@ const PackageDetail: React.FC = () => {
   const [activeTab, setActiveTab] = useState('info');
   const [isFavorite, setIsFavorite] = useState(false);
 
-  // URL의 쿼리 파라미터에서 tab 값을 읽어 activeTab 설정
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const tab = queryParams.get('tab');
@@ -82,11 +80,9 @@ const PackageDetail: React.FC = () => {
     }
   }, [location.search]);
 
-  // 패키지 데이터 및 reachable.json 페칭
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // sbom-detail.json에서 패키지 데이터 가져오기
         const response = await fetch(`/${projectName}/sbom-detail.json`);
         if (!response.ok) {
           throw new Error(`데이터 로딩 실패: ${response.statusText}`);
@@ -101,11 +97,9 @@ const PackageDetail: React.FC = () => {
           setError('패키지를 찾을 수 없습니다.');
         }
 
-        // reachable.json 데이터 가져오기
         const reachableResponse = await fetch(`/${projectName}/reachable.json`);
         if (!reachableResponse.ok) {
           console.warn('reachable.json 파일을 불러오는 데 실패했습니다.');
-          // reachableData는 필수 데이터가 아니므로 에러를 던지지 않고 넘어갑니다.
         } else {
           const reachableJson = await reachableResponse.json();
           setReachableData(reachableJson);
@@ -119,7 +113,6 @@ const PackageDetail: React.FC = () => {
     fetchData();
   }, [id, projectName]);
 
-  // 즐겨찾기 상태 초기화
   useEffect(() => {
     const favoritePackages: string[] = JSON.parse(localStorage.getItem('favoritePackages') || '[]');
     if (favoritePackages.includes(id || '')) {
@@ -127,7 +120,6 @@ const PackageDetail: React.FC = () => {
     }
   }, [id]);
 
-  // 즐겨찾기 클릭 핸들러
   const handleFavoriteClick = () => {
     const favoritePackages: string[] = JSON.parse(localStorage.getItem('favoritePackages') || '[]');
     let updatedFavorites: string[];
@@ -142,7 +134,6 @@ const PackageDetail: React.FC = () => {
     setIsFavorite(!isFavorite);
   };
 
-  // 탭 클릭 시 URL 업데이트 및 activeTab 설정
   const setActiveTabAndUpdateURL = (tab: string) => {
     setActiveTab(tab);
     navigate(`?tab=${tab}`, { replace: true });
@@ -166,29 +157,20 @@ const PackageDetail: React.FC = () => {
 
   const title = packageData.group ? `${packageData.group}/${packageData.name}` : packageData.name;
 
-  // external_references와 vulnerabilities 데이터 구조 확인
-  console.log('External References:', packageData.external_references);
-  console.log('Vulnerabilities:', packageData.vulnerabilities);
-
-  // external_references가 배열이므로 별도의 처리가 필요 없을 수 있습니다.
-  // 그러나 여전히 문자열로 되어있다면 쉼표로 분리하여 배열로 변환
   const externalReferencesArray = Array.isArray(packageData.external_references)
     ? packageData.external_references
     : packageData.external_references
         ? packageData.external_references.split(',').map((ref: string) => ref.trim()).filter(Boolean)
         : [];
 
-  // vulnerabilities에서 cve_link 추출
   const vulnerabilityLinks = packageData.vulnerabilities
     ? packageData.vulnerabilities.map((vuln) => vuln.cve_link).filter(Boolean)
     : [];
 
-  // 모든 레퍼런스 합치기 및 중복 제거
   const allReferences = Array.from(new Set([...externalReferencesArray, ...vulnerabilityLinks]));
 
   return (
     <div className="p-8 bg-white min-h-screen font-sans text-gray-900 w-full">
-      {/* 패키지 제목 및 즐겨찾기 버튼 */}
       <div className="flex flex-col md:flex-row items-center justify-between mb-8">
         <div className="flex items-center space-x-4">
           <h2 className="text-3xl md:text-4xl font-extrabold text-indigo-800 flex items-center">
@@ -219,7 +201,6 @@ const PackageDetail: React.FC = () => {
         </div>
       </div>
 
-      {/* 탭 메뉴 */}
       <nav className="flex space-x-4 border-b border-gray-300 mb-1" role="tablist">
         {[
           { name: 'Basic Information', key: 'info' },
@@ -242,13 +223,12 @@ const PackageDetail: React.FC = () => {
         ))}
       </nav>
 
-      {/* 탭 내용 */}
       <div className="space-y-6 max-w-7xl mx-auto w-full">
         {activeTab === 'info' && packageData && (
           <InfoPackage
             package_check={packageData.package_check}
             ecosystem={packageData.ecosystem}
-            licenses={packageData.licenses} // 수정: licenses는 이제 배열
+            licenses={packageData.licenses}
             hashes={packageData.hashes}
             dependencies={packageData.dependencies}
             bom_ref={packageData.bom_ref}
