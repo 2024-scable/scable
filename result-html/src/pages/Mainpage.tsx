@@ -18,7 +18,7 @@ const MainPage: React.FC = () => {
   };
 
   const handleViewClick = (projectId: string) => {
-    navigate(`/${projectId}`); // 리포팅 페이지로 리다이렉트
+    navigate(`/${projectId}`);
   };
 
   if (loading) {
@@ -32,14 +32,12 @@ const MainPage: React.FC = () => {
   const hasProjects = sortedProjectNames.length > 0;
 
   const formatTime = (time: string) => {
-    // '-'를 ':'로 교체하여 반환
     return time.replace(/-/g, ':');
   };
   
 
   return (
     <div className="p-1 max-w-7xl mx-auto">
-      {/* mainpage.jpg 이미지 표시 */}
       <div className="mb-20 mt-10 flex justify-start">
         <img
           src="/Mainpage.jpg"
@@ -48,7 +46,6 @@ const MainPage: React.FC = () => {
         />
       </div>
 
-      {/* 프로젝트 테이블 */}
       <div className="bg-white shadow rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full text-left">
@@ -67,7 +64,6 @@ const MainPage: React.FC = () => {
                   const projectGroup = groupedProjects[projectName];
                   return (
                     <React.Fragment key={projectName}>
-                      {/* 상위 프로젝트 행 */}
                       <tr className={`border-b bg-white`}>
                         <td className="py-2 px-4">
                           <span className="text-gray-700 font-medium">{`${index + 1}.`}</span>
@@ -107,7 +103,6 @@ const MainPage: React.FC = () => {
                         <td className="py-2 px-4"></td>
                       </tr>
 
-                      {/* 하위 프로젝트 행 */}
                       {expandedProjects.has(projectName) &&
                         projectGroup.map((project, subIndex) => (
                           <tr
@@ -142,7 +137,6 @@ const MainPage: React.FC = () => {
                                   onClick={() => handleViewClick(project.id)}
                                   aria-label="View Project"
                                 >
-                                  {/* 보기 아이콘 */}
                                   <svg
                                     className="w-5 h-5"
                                     viewBox="0 0 24 24"
