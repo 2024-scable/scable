@@ -205,7 +205,7 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
             const projectGroup = groupedProjects[projectName];
             return (
               <div key={projectName} className="mb-4">
-                <h3 className="mb-2 ml-4 flex items-center text-lg font-semibold text-gray-800">
+                <h3 className="mb-2 ml-4 flex items-center text-base font-semibold text-gray-800">
                   <svg
                     className="mr-2 h-4 w-4 fill-current text-gray-600"
                     viewBox="0 0 24 24"
